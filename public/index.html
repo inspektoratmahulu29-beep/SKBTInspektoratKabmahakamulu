@@ -304,6 +304,8 @@
 
   // ===== LOGIKA VALIDASI UPLOAD =====
   let uploadedDocs = new Set();
+  // Data untuk memantau jumlah file yang sudah diupload per kode dokumen
+  let uploadedCounts = {};
 
   async function callServer(action, params = {}) {
     const res = await fetch('/skbtHandler?action=' + action, {
@@ -344,6 +346,7 @@
     }
 
     uploadedDocs = new Set();
+    uploadedCounts = {};
 
     const res = await callServer('submitPengajuan', {
       nama_pemohon: nama, nip: nip, jabatan: jabatan, unit_kerja: unit, nomor_hp: nomor_hp, gmail: gmail
@@ -406,6 +409,7 @@
     } else {
       uploadDiv.classList.add('hidden');
       uploadedDocs.delete(code);
+      delete uploadedCounts[code];
     }
   }
 
@@ -436,6 +440,13 @@
     // Batasi ukuran file 5MB untuk mencegah 503
     if (file.size > 5 * 1024 * 1024) {
       showCustomAlert('File ' + file.name + ' melebihi 5MB! Silakan kompres atau pilih file lain.', 'error');
+      return;
+    }
+
+    // Batasi maksimal 2 file per dokumen
+    if (!uploadedCounts[code]) uploadedCounts[code] = 0;
+    if (uploadedCounts[code] >= 2) {
+      showCustomAlert('Maksimal 2 file untuk dokumen ' + dokumenList.find(d => d.code === code).nama + '!', 'error');
       return;
     }
 
@@ -470,6 +481,7 @@
           status.innerText = 'Tersimpan (Menunggu Finalisasi)';
           status.classList.add('staged');
           uploadedDocs.add(code);
+          uploadedCounts[code] = (uploadedCounts[code] || 0) + 1;
           setTimeout(() => progressDiv.classList.add('hidden'), 2000);
           renderFileHistory(code);
         } else {
@@ -557,6 +569,7 @@
     currentSubmissionId = null;
     namaPemohon = "";
     uploadedDocs = new Set();
+    uploadedCounts = {};
     document.getElementById('listPengajuan').classList.add('hidden');
   }
 
