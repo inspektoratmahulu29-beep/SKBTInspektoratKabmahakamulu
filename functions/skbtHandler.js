@@ -103,6 +103,7 @@ async function sendEmailNotification(env, submission, documents) {
           <tr><td style="padding: 8px; font-weight: bold;">Unit Kerja</td><td>: ${submission.unit_kerja}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">No HP</td><td>: ${submission.nomor_hp || '-'}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Gmail</td><td>: ${submission.gmail || '-'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">Keperluan</td><td>: ${submission.keperluan || '-'}</td></tr>
         </table>
         <h3 style="color: #0077b6;">Dokumen yang Diupload:</h3>
         <ul>${docList}</ul>
@@ -172,15 +173,17 @@ export const onRequest = async ({ request, env }) => {
 
   try {
     switch (action) {
-      // ============ STEP 1: SUBMIT PENGAJUAN ============
+      // ============ STEP 1: SUBMIT PENGAJUAN (DENGAN KEPERLUAN) ============
       case 'submitPengajuan': {
-        const { nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail } = params;
+        const { nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail, keperluan } = params;
         const nomor = 'SKBT-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 100);
 
+        // CATATAN: Pastikan tabel skbt_submissions sudah punya kolom 'keperluan'
+        // Jika belum, jalankan SQL: ALTER TABLE skbt_submissions ADD COLUMN keperluan TEXT;
         const insert = await env.DB.prepare(
-          `INSERT INTO skbt_submissions (nomor_pengajuan, nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail, status_verifikasi, current_level)
-           VALUES (?, ?, ?, ?, ?, ?, ?, 'Draft', 1)`
-        ).bind(nomor, nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail).run();
+          `INSERT INTO skbt_submissions (nomor_pengajuan, nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail, keperluan, status_verifikasi, current_level)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Draft', 1)`
+        ).bind(nomor, nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail, keperluan || '').run();
 
         const subId = insert.meta.last_row_id;
         return jsonResponse({ status: 'success', msg: 'Data Pemohon tersimpan', id: subId, nomor_pengajuan: nomor });
