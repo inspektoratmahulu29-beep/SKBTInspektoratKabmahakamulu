@@ -432,6 +432,13 @@
     const input = document.getElementById('file_' + code);
     if (!input.files.length) return;
     const file = input.files[0];
+
+    // Batasi ukuran file 10MB
+    if (file.size > 10 * 1024 * 1024) {
+      showCustomAlert('File ' + file.name + ' melebihi 10MB!', 'error');
+      return;
+    }
+
     const reader = new FileReader();
     const progressDiv = document.getElementById('progress_' + code);
     const bar = document.getElementById('bar_' + code);
