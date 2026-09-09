@@ -156,12 +156,19 @@ export const onRequest = async ({ request, env }) => {
       // ============ STEP 2: UPLOAD FILE (HANYA KE R2, TANPA DRIVE, TANPA EMAIL) ============
       case 'uploadDocument': {
         const { submission_id, dokumen_code, nama_dokumen, file_name, file_data } = params;
-        const bytes = Uint8Array.from(atob(file_data), c => c.charCodeAt(0));
+        
+        // Batasi ukuran file maksimal 10MB (untuk mencegah crash 503)
+        const decoded = atob(file_data);
+        const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
+        if (bytes.length > 10 * 1024 * 1024) {
+          return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 10MB.' });
+        }
+
         const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
 
-        // Simpan ke R2 dulu (Staging) - PUBLIC URL YANG BENAR
+        // Simpan ke R2 dulu (Staging) - Ganti URL di bawah dengan URL R2 yang benar
         await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
-        const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`; // URL R2 BARU YANG BENAR
+        const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`; // URL R2 Baru!
 
         // Simpan metadata ke D1 (gdrive_id NULL, TANPA upload ke Drive)
         await env.DB.prepare(
@@ -186,24 +193,17 @@ export const onRequest = async ({ request, env }) => {
 
         // 1. Upload semua dokumen ke Google Drive (Sekarang!)
         for (const doc of documents) {
-          // Kita cari file di R2 berdasarkan path yang tersimpan di file_url
           if (doc.file_url && doc.file_url.includes('r2.dev/')) {
             try {
-              // Ambil path file dari URL
-              const r2Path = doc.file_url.split('r2.dev/')[1];
-              // Ambil objek dari bucket R2
+              const r2Path = decodeURIComponent(doc.file_url.split('r2.dev/')[1]);
               const r2Object = await env.EVIDENCE_BUCKET.get(r2Path);
               
               if (r2Object) {
                 const bytes = await r2Object.arrayBuffer();
-                // Upload ke Google Drive dengan folder nama_pemohon/kode_dokumen
                 const gdriveId = await uploadToGoogleDrive(env, `${nama_pemohon}/${doc.dokumen_code}`, doc.file_name, bytes, env.GOOGLE_DRIVE_FOLDER_ID);
-                
+              
                 // Update DB dengan gdrive_id
                 await env.DB.prepare("UPDATE skbt_documents SET gdrive_id = ? WHERE id = ?").bind(gdriveId, doc.id).run();
-                console.log('Berhasil upload ke Drive:', doc.file_name);
-              } else {
-                console.error('File tidak ditemukan di R2:', r2Path);
               }
             } catch (e) {
               console.error('Gagal upload ke Drive:', doc.file_name, e.message);
@@ -239,6 +239,7 @@ export const onRequest = async ({ request, env }) => {
         return jsonResponse({ status: 'error', msg: 'Aksi tidak dikenal' });
     }
   } catch (err) {
+    console.error('Error di handler:', err);
     return jsonResponse({ status: 'error', msg: 'Error: ' + err.message });
   }
 };
