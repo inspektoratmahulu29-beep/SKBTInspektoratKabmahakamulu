@@ -60,6 +60,7 @@
     @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     .fade-up { animation: fadeUp 0.6s ease; }
     .hidden { display: none !important; }
+    /* MODAL MODERN */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
     .modal-overlay.active { opacity: 1; visibility: visible; }
     .custom-modal { background: linear-gradient(135deg, #0f2027, #203a43); border: 2px solid var(--green); border-radius: 20px; padding: 30px; max-width: 420px; width: 90%; text-align: center; transform: scale(0.9); transition: transform 0.3s ease; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
@@ -70,6 +71,7 @@
     .modal-icon.info { background: rgba(0,180,216,0.2); color: var(--primary-light); border: 1px solid var(--primary-light); }
     .modal-text { font-size: 1.1rem; color: #fff; margin-bottom: 25px; font-weight: 500; }
     .modal-actions { display: flex; justify-content: center; gap: 10px; }
+    /* CAPTCHA & PROGRESS */
     .captcha-box { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-top: 20px; }
     .captcha-question { font-size: 1.2rem; font-weight: 700; color: #ffd166; }
     .captcha-input { width: 80px; text-align: center; }
@@ -79,12 +81,14 @@
     .progress-bar-big { height: 20px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; overflow: hidden; margin: 20px 0; }
     .progress-bar-big-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00b4d8, #06d6a0); transition: width 0.3s ease; }
     .progress-text { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    /* PENCARIAN */
     .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
     .search-box input { flex: 1; }
   </style>
 </head>
 <body>
 
+<!-- MODAL MODERN -->
 <div class="modal-overlay" id="customAlertModal">
   <div class="custom-modal">
     <div class="modal-icon" id="modalIcon"></div>
@@ -95,6 +99,7 @@
   </div>
 </div>
 
+<!-- PROGRESS OVERLAY -->
 <div class="progress-overlay" id="progressOverlay">
   <div class="progress-container">
     <h3 style="color: #fff;">Sedang Mengirim Pengajuan...</h3>
@@ -104,6 +109,7 @@
 </div>
 
 <div class="container">
+  <!-- HEADER LOGO -->
   <div class="header">
     <div class="logo-wrapper">
       <img src="/logo-mahakam.png" alt="Logo Kabupaten Mahakam Ulu" title="Pemerintah Kabupaten Mahakam Ulu">
@@ -119,31 +125,63 @@
 
   <div class="hero">
     <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="form-section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;">
+            <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
+          </svg>
+          Aplikasi Pengajuan SKBT
+        </h4>
+      </div>
       <button class="btn-outline-light-custom" onclick="tampilkanPengajuan()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;"><path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
+          <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
+        </svg>
         Lihat Pengajuan
       </button>
     </div>
 
+    <!-- STEP INDICATOR -->
     <div class="step-indicator">
       <div class="step active" id="step1"><span class="step-icon">1</span> Data Pemohon</div>
       <div class="step" id="step2"><span class="step-icon">2</span> Upload Dokumen</div>
       <div class="step" id="step3"><span class="step-icon">3</span> Selesai</div>
     </div>
 
+    <!-- ===== HALAMAN 1: DATA PEMOHON ===== -->
     <div id="halaman1" class="fade-up">
       <div class="form-section">
         <h4 class="form-section-title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
           Data Pemohon
         </h4>
         <div class="row g-3">
-          <div class="col-md-6"><label class="form-label">Nama Lengkap</label><input type="text" id="nama" class="form-control" placeholder="Nama Pemohon"></div>
-          <div class="col-md-6"><label class="form-label">NIP</label><input type="text" id="nip" class="form-control" placeholder="NIP"></div>
-          <div class="col-md-6"><label class="form-label">Jabatan</label><input type="text" id="jabatan" class="form-control" placeholder="Jabatan"></div>
-          <div class="col-md-6"><label class="form-label">Unit Kerja / OPD</label><input type="text" id="unit" class="form-control" placeholder="Unit Kerja"></div>
-          <div class="col-md-6"><label class="form-label">Nomor HP / WhatsApp Aktif</label><input type="text" id="nomor_hp" class="form-control" placeholder="08xxxxxxxxxx"></div>
-          <div class="col-md-6"><label class="form-label">Gmail Aktif</label><input type="email" id="gmail" class="form-control" placeholder="example@gmail.com"></div>
+          <div class="col-md-6">
+            <label class="form-label">Nama Lengkap</label>
+            <input type="text" id="nama" class="form-control" placeholder="Nama Pemohon">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">NIP</label>
+            <input type="text" id="nip" class="form-control" placeholder="NIP">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Jabatan</label>
+            <input type="text" id="jabatan" class="form-control" placeholder="Jabatan">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Unit Kerja / OPD</label>
+            <input type="text" id="unit" class="form-control" placeholder="Unit Kerja">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Nomor HP / WhatsApp Aktif</label>
+            <input type="text" id="nomor_hp" class="form-control" placeholder="08xxxxxxxxxx">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Gmail Aktif</label>
+            <input type="email" id="gmail" class="form-control" placeholder="example@gmail.com">
+          </div>
         </div>
       </div>
       <div class="d-flex justify-content-end mt-4">
@@ -151,16 +189,20 @@
       </div>
     </div>
 
+    <!-- ===== HALAMAN 2: UPLOAD DOKUMEN ===== -->
     <div id="halaman2" class="hidden">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="form-section-title mb-0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;">
+            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
           Dokumen yang Diperlukan
         </h4>
         <button class="btn-outline-light-custom" onclick="kembaliKeHalaman1()">← Kembali</button>
       </div>
       <div id="daftarDokumen" class="row g-3"></div>
-
+      
+      <!-- CAPTCHA -->
       <div class="captcha-box">
         <span class="captcha-question" id="captchaQuestion">3 + 4 = ?</span>
         <input type="number" id="captchaInput" class="form-control captcha-input" placeholder="?">
@@ -172,26 +214,35 @@
       </div>
     </div>
 
+    <!-- ===== HALAMAN 3: SUKSES ===== -->
     <div id="halaman3" class="hidden text-center">
-      <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+      </svg>
       <h3 class="mt-3">Pengajuan Berhasil Dikirim!</h3>
       <h4 class="text-warning mt-3" id="nomorSKBT" style="font-size: 1.5rem; font-weight: 800; letter-spacing: 1px;"></h4>
       <p class="text-muted mt-2">Notifikasi email telah dikirim ke Admin. Dokumen telah diupload ke Google Drive.</p>
       <button class="btn-gradient mt-3" onclick="resetForm()">Buat Pengajuan Baru</button>
     </div>
 
+    <!-- ===== DAFTAR PENGAJUAN ===== -->
     <div id="listPengajuan" class="hidden">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="form-section-title mb-0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;"><path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;">
+            <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
+          </svg>
           Daftar Pengajuan
         </h4>
         <button class="btn-outline-light-custom" onclick="kembaliKeFormAwal()">← Kembali</button>
       </div>
+      
+      <!-- PENCARIAN -->
       <div class="search-box">
         <input type="text" id="searchInput" class="form-control" placeholder="Cari berdasarkan No. SKBT, Nama, atau Unit Kerja...">
         <button class="btn-outline-light-custom" onclick="filterPengajuan()">Cari</button>
       </div>
+
       <div id="listContainer"></div>
       <div id="emptySearch" class="hidden" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada pengajuan ditemukan.</div>
     </div>
@@ -199,32 +250,49 @@
 </div>
 
 <script>
+  // ===== FUNGSI MODAL MODERN =====
   function showCustomAlert(message, type = 'info') {
     const overlay = document.getElementById('customAlertModal');
     const icon = document.getElementById('modalIcon');
     const text = document.getElementById('modalText');
+
     text.innerText = message;
     icon.className = 'modal-icon ' + type;
+
     let svgContent = '';
-    if (type === 'success') { svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'; }
-    else if (type === 'error') { svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>'; }
-    else { svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'; }
+    if (type === 'success') {
+      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+    } else if (type === 'error') {
+      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+    } else {
+      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+    }
+
     icon.innerHTML = svgContent;
     overlay.classList.add('active');
   }
-  function closeModal() { document.getElementById('customAlertModal').classList.remove('active'); }
 
+  function closeModal() {
+    document.getElementById('customAlertModal').classList.remove('active');
+  }
+
+  // ===== FUNGSI PROGRESS OVERLAY =====
   function showProgressOverlay() {
     document.getElementById('progressOverlay').classList.add('active');
     document.getElementById('progressBarBigFill').style.width = '0%';
     document.getElementById('progressText').innerText = '0%';
   }
+  
   function updateProgress(percent) {
     document.getElementById('progressBarBigFill').style.width = percent + '%';
     document.getElementById('progressText').innerText = percent + '%';
   }
-  function hideProgressOverlay() { document.getElementById('progressOverlay').classList.remove('active'); }
 
+  function hideProgressOverlay() {
+    document.getElementById('progressOverlay').classList.remove('active');
+  }
+
+  // ===== CAPTCHA =====
   let captchaResult = 0;
   function generateCaptcha() {
     const num1 = Math.floor(Math.random() * 9) + 1;
@@ -234,7 +302,9 @@
     document.getElementById('captchaInput').value = '';
   }
 
+  // ===== LOGIKA VALIDASI UPLOAD =====
   let uploadedDocs = new Set();
+  let uploadedDocCount = {}; // Untuk melacak jumlah file per kolom
 
   async function callServer(action, params = {}) {
     const res = await fetch('/skbtHandler?action=' + action, {
@@ -275,6 +345,7 @@
     }
 
     uploadedDocs = new Set();
+    uploadedDocCount = {};
 
     const res = await callServer('submitPengajuan', {
       nama_pemohon: nama, nip: nip, jabatan: jabatan, unit_kerja: unit, nomor_hp: nomor_hp, gmail: gmail
@@ -303,16 +374,22 @@
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="chk_${doc.code}" onchange="toggleUpload('${doc.code}')">
             <label class="form-check-label" for="chk_${doc.code}">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color:#90e0ef; margin-right:8px;"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color:#90e0ef; margin-right:8px;">
+                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+              </svg>
               ${doc.nama}
             </label>
           </div>
           <div id="upload_${doc.code}" class="hidden">
             <div class="upload-area" onclick="document.getElementById('file_${doc.code}').click()">
-              <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              <svg viewBox="0 0 24 24">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+              </svg>
               <p class="mb-0">Klik untuk Upload</p>
               <input type="file" id="file_${doc.code}" style="display:none;" onchange="uploadFile('${doc.code}')">
-              <div class="progress-upload hidden" id="progress_${doc.code}"><div class="progress-bar-fill" id="bar_${doc.code}"></div></div>
+              <div class="progress-upload hidden" id="progress_${doc.code}">
+                <div class="progress-bar-fill" id="bar_${doc.code}"></div>
+              </div>
               <small id="status_${doc.code}" class="upload-status"></small>
             </div>
             <div id="filehistory_${doc.code}" class="file-history"></div>
@@ -342,7 +419,13 @@
       const historyDiv = document.getElementById('filehistory_' + code);
       historyDiv.innerHTML = '';
       docs.forEach(doc => {
-        historyDiv.innerHTML += `<div class="file-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><a href="${doc.file_url}" target="_blank">${doc.file_name}</a></div>`;
+        historyDiv.innerHTML += `
+          <div class="file-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;">
+              <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+            </svg>
+            <a href="${doc.file_url}" target="_blank">${doc.file_name}</a>
+          </div>`;
       });
     }
   }
@@ -352,17 +435,16 @@
     if (!input.files.length) return;
     const file = input.files[0];
 
-    // Batasi 2 file per kolom
-    const existingFiles = document.querySelectorAll(`#filehistory_${code} .file-item`).length;
-    if (existingFiles >= 2) {
-      showCustomAlert('Maksimal 2 file untuk setiap dokumen!', 'error');
-      input.value = '';
+    // Batasi ukuran file 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      showCustomAlert('File ' + file.name + ' melebihi 5MB! Silakan kompres atau pilih file lain.', 'error');
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      showCustomAlert('File ' + file.name + ' melebihi 5MB! Silakan kompres atau pilih file lain.', 'error');
-      input.value = '';
+    // Batasi maksimal 2 file per kolom
+    const currentCount = uploadedDocCount[code] || 0;
+    if (currentCount >= 2) {
+      showCustomAlert('Maksimal 2 file per kolom. File ' + file.name + ' tidak dapat diupload.', 'error');
       return;
     }
 
@@ -397,6 +479,7 @@
           status.innerText = 'Tersimpan (Menunggu Finalisasi)';
           status.classList.add('staged');
           uploadedDocs.add(code);
+          uploadedDocCount[code] = (uploadedDocCount[code] || 0) + 1;
           setTimeout(() => progressDiv.classList.add('hidden'), 2000);
           renderFileHistory(code);
         } else {
@@ -408,6 +491,7 @@
         bar.style.width = '0%';
         status.innerText = 'Gagal: Server Error (503). Coba file lebih kecil.';
         status.classList.add('error');
+        console.error('Upload error:', err);
       }
     };
     reader.readAsDataURL(file);
@@ -437,34 +521,39 @@
         return doc ? doc.nama : code;
       }).join(', ');
 
-      showCustomAlert('Semua dokumen yang dicentang WAJIB diupload!\\nDokumen yang belum diupload: ' + missingNames, 'error');
+      showCustomAlert('Semua dokumen yang dicentang WAJIB diupload!\nDokumen yang belum diupload: ' + missingNames, 'error');
       return;
     }
 
     showProgressOverlay();
     updateProgress(10);
 
-    const res = await callServer('finalizeSubmission', {
-      submission_id: currentSubmissionId,
-      nama_pemohon: namaPemohon
-    });
+    try {
+      const res = await callServer('finalizeSubmission', {
+        submission_id: currentSubmissionId,
+        nama_pemohon: namaPemohon
+      });
 
-    updateProgress(80);
+      updateProgress(80);
 
-    if (res.status === 'success') {
-      updateProgress(100);
-      setTimeout(() => {
+      if (res.status === 'success') {
+        updateProgress(100);
+        setTimeout(() => {
+          hideProgressOverlay();
+          document.getElementById('halaman2').classList.add('hidden');
+          document.getElementById('halaman3').classList.remove('hidden');
+          document.getElementById('step2').classList.remove('active');
+          document.getElementById('step3').classList.add('active');
+          document.getElementById('nomorSKBT').innerText = res.nomor_pengajuan;
+          showCustomAlert('Pengajuan berhasil dikirim! Dokumen telah diupload ke Drive.', 'success');
+        }, 500);
+      } else {
         hideProgressOverlay();
-        document.getElementById('halaman2').classList.add('hidden');
-        document.getElementById('halaman3').classList.remove('hidden');
-        document.getElementById('step2').classList.remove('active');
-        document.getElementById('step3').classList.add('active');
-        document.getElementById('nomorSKBT').innerText = res.nomor_pengajuan;
-        showCustomAlert('Pengajuan berhasil dikirim! Dokumen telah diupload ke Drive.', 'success');
-      }, 500);
-    } else {
+        showCustomAlert('Gagal: ' + res.msg, 'error');
+      }
+    } catch (err) {
       hideProgressOverlay();
-      showCustomAlert('Gagal: ' + res.msg, 'error');
+      showCustomAlert('Server error (503). Coba lagi beberapa saat.', 'error');
     }
   }
 
@@ -478,6 +567,7 @@
     currentSubmissionId = null;
     namaPemohon = "";
     uploadedDocs = new Set();
+    uploadedDocCount = {};
     document.getElementById('listPengajuan').classList.add('hidden');
   }
 
@@ -488,12 +578,13 @@
     document.getElementById('step2').classList.remove('active');
   }
 
+  // ===== DAFTAR PENGAJUAN + PENCARIAN =====
   async function tampilkanPengajuan() {
     document.getElementById('halaman1').classList.add('hidden');
     document.getElementById('halaman2').classList.add('hidden');
     document.getElementById('listPengajuan').classList.remove('hidden');
     document.getElementById('searchInput').value = '';
-
+    
     const res = await callServer('getAllPengajuan');
     allPengajuanData = res;
     renderListPengajuan(allPengajuanData);
@@ -502,11 +593,13 @@
   function renderListPengajuan(data) {
     const list = document.getElementById('listContainer');
     const empty = document.getElementById('emptySearch');
+    
     if (!data || data.length === 0) {
       list.innerHTML = '';
       empty.classList.remove('hidden');
       return;
     }
+    
     empty.classList.add('hidden');
     list.innerHTML = data.map(s => `
       <div class="list-item">
@@ -520,8 +613,12 @@
 
   function filterPengajuan() {
     const query = document.getElementById('searchInput').value.toLowerCase().trim();
-    if (!query) { renderListPengajuan(allPengajuanData); return; }
-    const filtered = allPengajuanData.filter(s =>
+    if (!query) {
+      renderListPengajuan(allPengajuanData);
+      return;
+    }
+    
+    const filtered = allPengajuanData.filter(s => 
       (s.nomor_pengajuan && s.nomor_pengajuan.toLowerCase().includes(query)) ||
       (s.nama_pemohon && s.nama_pemohon.toLowerCase().includes(query)) ||
       (s.unit_kerja && s.unit_kerja.toLowerCase().includes(query))
@@ -536,6 +633,7 @@
     document.getElementById('step2').classList.remove('active');
   }
 
+  // Inisialisasi
   document.getElementById('daftarDokumen').innerHTML = '';
   generateCaptcha();
 </script>
