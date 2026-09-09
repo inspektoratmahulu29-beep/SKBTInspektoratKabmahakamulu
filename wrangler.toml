@@ -1,0 +1,11 @@
+name = "skbt-mahakam-ulu"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "skbt_db"
+database_id = "YOUR_D1_DATABASE_ID"
+
+[[r2_buckets]]
+binding = "EVIDENCE_BUCKET"
+bucket_name = "skbt-evidence"
