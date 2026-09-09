@@ -99,6 +99,7 @@ async function sendEmailNotification(env, submission, documents) {
           <tr><td style="padding: 8px; font-weight: bold; width: 150px;">Nomor</td><td>: ${submission.nomor_pengajuan}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Nama</td><td>: ${submission.nama_pemohon}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">NIP</td><td>: ${submission.nip || '-'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">Pangkat/Golongan</td><td>: ${submission.pangkat_golongan || '-'}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Jabatan</td><td>: ${submission.jabatan || '-'}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Unit Kerja</td><td>: ${submission.unit_kerja}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">No HP</td><td>: ${submission.nomor_hp || '-'}</td></tr>
@@ -173,17 +174,15 @@ export const onRequest = async ({ request, env }) => {
 
   try {
     switch (action) {
-      // ============ STEP 1: SUBMIT PENGAJUAN (DENGAN KEPERLUAN) ============
+      // ============ STEP 1: SUBMIT PENGAJUAN (DENGAN PANGKAT/GOLONGAN & KEPERLUAN) ============
       case 'submitPengajuan': {
-        const { nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail, keperluan } = params;
+        const { nama_pemohon, nip, pangkat_golongan, jabatan, unit_kerja, nomor_hp, gmail, keperluan } = params;
         const nomor = 'SKBT-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 100);
 
-        // CATATAN: Pastikan tabel skbt_submissions sudah punya kolom 'keperluan'
-        // Jika belum, jalankan SQL: ALTER TABLE skbt_submissions ADD COLUMN keperluan TEXT;
         const insert = await env.DB.prepare(
-          `INSERT INTO skbt_submissions (nomor_pengajuan, nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail, keperluan, status_verifikasi, current_level)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Draft', 1)`
-        ).bind(nomor, nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail, keperluan || '').run();
+          `INSERT INTO skbt_submissions (nomor_pengajuan, nama_pemohon, nip, pangkat_golongan, jabatan, unit_kerja, nomor_hp, gmail, keperluan, status_verifikasi, current_level)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Draft', 1)`
+        ).bind(nomor, nama_pemohon, nip, pangkat_golongan, jabatan, unit_kerja, nomor_hp, gmail, keperluan || '').run();
 
         const subId = insert.meta.last_row_id;
         return jsonResponse({ status: 'success', msg: 'Data Pemohon tersimpan', id: subId, nomor_pengajuan: nomor });
@@ -205,7 +204,6 @@ export const onRequest = async ({ request, env }) => {
           const r2Path = `skbt/${submission_id}/${dokumen_code}/${safeNama}_${Date.now()}_${file_name}`;
           const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`;
 
-          // Tentukan Content-Type berdasarkan ekstensi file (PENTING untuk viewer)
           const contentType = getContentType(file_name);
 
           await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: contentType } });
@@ -232,7 +230,6 @@ export const onRequest = async ({ request, env }) => {
         const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(submission_id).all();
         const documents = docs.results;
 
-        // Upload semua dokumen ke Google Drive
         for (const doc of documents) {
           if (doc.file_url && doc.file_url.includes('r2.dev/')) {
             try {
@@ -258,10 +255,8 @@ export const onRequest = async ({ request, env }) => {
           }
         }
 
-        // Kirim Email
         await sendEmailNotification(env, sub, documents);
 
-        // Update Status
         await env.DB.prepare(`UPDATE skbt_submissions SET status_verifikasi = 'Menunggu Irban' WHERE id = ?`).bind(submission_id).run();
 
         return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dikirim', nomor_pengajuan: sub.nomor_pengajuan });
