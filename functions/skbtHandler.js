@@ -159,8 +159,8 @@ export const onRequest = async ({ request, env }) => {
         try {
           const decoded = atob(file_data);
           const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
-          if (bytes.length > 5 * 1024 * 1024) {
-            return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 5MB.' });
+          if (bytes.length > 10 * 1024 * 1024) { // Maksimal 10MB
+            return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 10MB.' });
           }
 
           const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
@@ -191,9 +191,15 @@ export const onRequest = async ({ request, env }) => {
         const documents = docs.results;
 
         // Upload semua dokumen ke Google Drive satu per satu
+        let uploadSuccessCount = 0;
+        let uploadFailCount = 0;
         for (const doc of documents) {
+          // Log untuk debug
+          console.log('Memproses file:', doc.file_name, 'URL:', doc.file_url);
+          
           if (doc.file_url && doc.file_url.includes('r2.dev/')) {
             try {
+              // Ambil path R2 dari URL
               const r2Path = decodeURIComponent(doc.file_url.split('r2.dev/')[1]);
               const r2Object = await env.EVIDENCE_BUCKET.get(r2Path);
               
@@ -202,12 +208,19 @@ export const onRequest = async ({ request, env }) => {
                 const gdriveId = await uploadToGoogleDrive(env, `${nama_pemohon}/${doc.dokumen_code}`, doc.file_name, bytes, env.GOOGLE_DRIVE_FOLDER_ID);
               
                 await env.DB.prepare("UPDATE skbt_documents SET gdrive_id = ? WHERE id = ?").bind(gdriveId, doc.id).run();
+                uploadSuccessCount++;
+              } else {
+                console.error('File tidak ditemukan di R2:', r2Path);
+                uploadFailCount++;
               }
             } catch (e) {
               console.error('Gagal upload ke Drive:', doc.file_name, e.message);
+              uploadFailCount++;
             }
           }
         }
+
+        console.log(`Upload ke Google Drive selesai: ${uploadSuccessCount} sukses, ${uploadFailCount} gagal`);
 
         // Kirim Email
         await sendEmailNotification(env, sub, documents);
@@ -215,7 +228,7 @@ export const onRequest = async ({ request, env }) => {
         // Update Status
         await env.DB.prepare(`UPDATE skbt_submissions SET status_verifikasi = 'Menunggu Irban' WHERE id = ?`).bind(submission_id).run();
 
-        return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dikirim', nomor_pengajuan: sub.nomor_pengajuan });
+        return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dikirim', nomor_pengajuan: sub.nomor_pengajuan, successCount: uploadSuccessCount, failCount: uploadFailCount });
       }
 
       // ============ AMBIL DETAIL PENGAJUAN ============
