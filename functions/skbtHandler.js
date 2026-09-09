@@ -56,12 +56,10 @@ async function getOrCreateFolder(accessToken, parentId, folderName) {
 async function uploadToGoogleDrive(env, folderPath, fileName, bytes, rootFolderId) {
   const accessToken = await getGoogleAccessToken(env);
   const pathSegments = folderPath.split('/').filter(Boolean);
-
   let currentFolderId = rootFolderId;
   for (const folderName of pathSegments) {
     currentFolderId = await getOrCreateFolder(accessToken, currentFolderId, folderName);
   }
-
   const metadata = { name: fileName, parents: [currentFolderId] };
   const initResponse = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable', {
     method: 'POST',
@@ -87,21 +85,21 @@ async function uploadToGoogleDrive(env, folderPath, fileName, bytes, rootFolderI
 }
 // ============ END GOOGLE DRIVE ============
 
-// ============ SEND EMAIL NOTIFICATION ============
+// ============ SEND EMAIL NOTIFICATION (Resend) - HANYA DIPANGGIL SAAT FINAL ============
 async function sendEmailNotification(env, submission, documents) {
   if (!env.RESEND_API_KEY || !env.ADMIN_EMAIL) return;
   try {
-    const docList = documents.map(d => `<li>${d.nama_dokumen}</li>`).join('');
+    const docList = documents.map(d => `<li>${d.nama_dokumen} (${d.file_name})</li>`).join('');
     const emailBody = `<div style="font-family: Arial, sans-serif; background: #f4f7fb; padding: 20px;">
         <h2 style="color: #03045e;">Pengajuan SKBT Baru</h2>
-        <p>Sebuah pengajuan baru telah dibuat.</p>
+        <p>Sebuah pengajuan baru telah dibuat dan dokumen telah diunggah.</p>
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 8px; font-weight: bold; width: 150px;">Nomor</td><td>: ${submission.nomor_pengajuan}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Nama</td><td>: ${submission.nama_pemohon}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">NIP</td><td>: ${submission.nip || '-'}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Jabatan</td><td>: ${submission.jabatan || '-'}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Unit Kerja</td><td>: ${submission.unit_kerja}</td></tr>
-          <tr><td style="padding: 8px; font-weight: bold;">Nomor HP</td><td>: ${submission.nomor_hp || '-'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">No HP</td><td>: ${submission.nomor_hp || '-'}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Gmail</td><td>: ${submission.gmail || '-'}</td></tr>
         </table>
         <h3 style="color: #0077b6;">Dokumen yang Diupload:</h3>
@@ -111,12 +109,7 @@ async function sendEmailNotification(env, submission, documents) {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: 'Pengajuan SKBT <onboarding@resend.dev>', // Ubah nama pengirim di sini
-        to: env.ADMIN_EMAIL,
-        subject: 'Pengajuan SKBT Baru: ' + submission.nomor_pengajuan,
-        html: emailBody
-      })
+      body: JSON.stringify({ from: 'Pengajuan SKBT <onboarding@resend.dev>', to: env.ADMIN_EMAIL, subject: 'Pengajuan SKBT Baru: ' + submission.nomor_pengajuan, html: emailBody })
     });
     console.log('Email Status:', res.status, await res.json());
   } catch (e) { console.error('Gagal kirim email:', e); }
@@ -144,64 +137,81 @@ export const onRequest = async ({ request, env }) => {
 
   try {
     switch (action) {
-      case 'getDokumenList': {
-        return jsonResponse([
-          { code: 'SKCPNS', nama: 'SK CPNS' },
-          { code: 'SKPNS', nama: 'SK PNS' },
-          { code: 'SKPangkat', nama: 'SK Pangkat Terakhir' },
-          { code: 'SKJabatan', nama: 'SK Jabatan Terakhir' },
-          { code: 'SKP', nama: 'SKP 1 atau 2 Tahun Terakhir' },
-          { code: 'SuratPermohonan', nama: 'Surat Permohonan' },
-          { code: 'SuratPengantar', nama: 'Surat Pengantar dari Pimpinan OPD' },
-          { code: 'SKBebasMasalah', nama: 'SK Bebas Masalah' },
-          { code: 'SKBendahara', nama: 'SK Status Bebas Hutang/Piutang' }
-        ]);
-      }
-
-      // ============ SUBMIT PENGAJUAN (STEP 1) ============
+      // ============ STEP 1: SUBMIT PENGAJUAN (TANPA EMAIL, TANPA DRIVE) ============
       case 'submitPengajuan': {
         const { nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail } = params;
         const nomor = 'SKBT-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 100);
 
         const insert = await env.DB.prepare(
           `INSERT INTO skbt_submissions (nomor_pengajuan, nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail, status_verifikasi, current_level)
-           VALUES (?, ?, ?, ?, ?, ?, ?, 'Menunggu Irban', 1)`
+           VALUES (?, ?, ?, ?, ?, ?, ?, 'Draft', 1)`
         ).bind(nomor, nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail).run();
 
         const subId = insert.meta.last_row_id;
 
-        const sub = await env.DB.prepare("SELECT * FROM skbt_submissions WHERE id = ?").bind(subId).first();
-        const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(subId).all();
-        await sendEmailNotification(env, sub, docs.results);
-
-        return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dibuat', nomor_pengajuan: nomor, id: subId });
+        // Hanya kirim balik ID dan Nomor, TANPA Email
+        return jsonResponse({ status: 'success', msg: 'Data Pemohon tersimpan', id: subId, nomor_pengajuan: nomor });
       }
 
-      // ============ UPLOAD FILE (STEP 2) ============
+      // ============ STEP 2: UPLOAD FILE (HANYA KE R2, TANPA DRIVE, TANPA EMAIL) ============
       case 'uploadDocument': {
-        const { submission_id, dokumen_code, nama_dokumen, file_name, file_data, nama_pemohon } = params;
+        const { submission_id, dokumen_code, nama_dokumen, file_name, file_data } = params;
         const bytes = Uint8Array.from(atob(file_data), c => c.charCodeAt(0));
         const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
 
+        // Simpan ke R2 dulu (Staging)
         await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
         const publicUrl = `https://pub-8e4e0075c2e4428e95f6455b2e2b9826.r2.dev/${r2Path}`; // Ganti dengan URL R2 Anda
 
-        let gdriveId = null;
-        if (env.GOOGLE_DRIVE_CLIENT_ID && env.GOOGLE_DRIVE_CLIENT_SECRET && env.GOOGLE_DRIVE_REFRESH_TOKEN && env.GOOGLE_DRIVE_FOLDER_ID) {
-          try {
-            const folderPath = `${nama_pemohon}/${dokumen_code}`;
-            gdriveId = await uploadToGoogleDrive(env, folderPath, file_name, bytes, env.GOOGLE_DRIVE_FOLDER_ID);
-          } catch (e) { console.error('GDrive upload failed:', e); }
-        }
-
+        // Simpan metadata ke D1 (gdrive_id NULL, TANPA upload ke Drive)
         await env.DB.prepare(
           `INSERT INTO skbt_documents (submission_id, dokumen_code, nama_dokumen, file_name, file_url, gdrive_id)
-           VALUES (?, ?, ?, ?, ?, ?)`
-        ).bind(submission_id, dokumen_code, nama_dokumen, file_name, publicUrl, gdriveId).run();
+           VALUES (?, ?, ?, ?, ?, NULL)`
+        ).bind(submission_id, dokumen_code, nama_dokumen, file_name, publicUrl).run();
 
-        return jsonResponse({ status: 'success', url: publicUrl, gdrive_id: gdriveId });
+        return jsonResponse({ status: 'success', url: publicUrl, msg: 'File tersimpan di server, menunggu finalisasi' });
       }
 
+      // ============ STEP 3: FINALISASI (UPLOAD DRIVE + EMAIL + NOMOR) ============
+      case 'finalizeSubmission': {
+        const { submission_id, nama_pemohon } = params;
+        
+        // Ambil detail pengajuan
+        const sub = await env.DB.prepare("SELECT * FROM skbt_submissions WHERE id = ?").bind(submission_id).first();
+        if (!sub) return jsonResponse({ status: 'error', msg: 'Pengajuan tidak ditemukan' });
+
+        // Ambil semua dokumen
+        const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(submission_id).all();
+        const documents = docs.results;
+
+        // 1. Upload semua dokumen ke Google Drive (Sekarang!)
+        for (const doc of documents) {
+          if (doc.file_url && doc.file_url.includes('r2.dev/')) {
+            try {
+              const r2Path = decodeURIComponent(doc.file_url.split('r2.dev/')[1]);
+              const r2Object = await env.EVIDENCE_BUCKET.get(r2Path);
+              const bytes = await r2Object.arrayBuffer();
+              const gdriveId = await uploadToGoogleDrive(env, `${nama_pemohon}/${doc.dokumen_code}`, doc.file_name, bytes, env.GOOGLE_DRIVE_FOLDER_ID);
+              
+              // Update DB dengan gdrive_id
+              await env.DB.prepare("UPDATE skbt_documents SET gdrive_id = ? WHERE id = ?").bind(gdriveId, doc.id).run();
+            } catch (e) {
+              console.error('Gagal upload ke Drive:', doc.file_name, e.message);
+            }
+          }
+        }
+
+        // 2. Kirim Email Notifikasi
+        await sendEmailNotification(env, sub, documents);
+
+        // 3. Update Status Pengajuan menjadi "Menunggu Irban"
+        await env.DB.prepare(`UPDATE skbt_submissions SET status_verifikasi = 'Menunggu Irban' WHERE id = ?`).bind(submission_id).run();
+
+        // 4. Kembalikan Nomor Pengajuan (Akhirnya!)
+        return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dikirim', nomor_pengajuan: sub.nomor_pengajuan });
+      }
+
+      // ============ AMBIL DETAIL PENGAJUAN ============
       case 'getPengajuanById': {
         const { id } = params;
         const sub = await env.DB.prepare("SELECT * FROM skbt_submissions WHERE id = ?").bind(id).first();
@@ -209,6 +219,7 @@ export const onRequest = async ({ request, env }) => {
         return jsonResponse({ submission: sub, documents: docs.results });
       }
 
+      // ============ DASHBOARD ============
       case 'getAllPengajuan': {
         const { results } = await env.DB.prepare("SELECT * FROM skbt_submissions ORDER BY created_at DESC").all();
         return jsonResponse(results);
