@@ -7,12 +7,14 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
+
     :root {
       --primary: #0077b6;
       --primary-light: #00b4d8;
       --secondary: #90e0ef;
       --dark: #03045e;
       --green: #06d6a0;
+      --green-dark: #118ab2;
       --white: #ffffff;
       --surface: rgba(255, 255, 255, 0.05);
       --surface-hover: rgba(255, 255, 255, 0.1);
@@ -20,6 +22,7 @@
       --text: #f8f9fa;
       --text-muted: #adb5bd;
     }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', system-ui, sans-serif;
@@ -30,14 +33,19 @@
       min-height: 100vh;
       padding: 30px;
     }
+
     @keyframes gradientBG {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    .container { max-width: 1200px; margin: 0 auto; }
 
-    /* HEADER LOGO */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ====== HEADER ====== */
     .header {
       display: flex;
       justify-content: space-between;
@@ -48,18 +56,41 @@
       padding: 15px 25px;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .logo-wrapper { display: flex; align-items: center; gap: 20px; }
-    .logo-wrapper img { width: 80px; height: 80px; object-fit: contain; }
-    .header-title { text-align: center; flex: 1; }
+
+    .logo-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo-wrapper img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      text-align: center;
+      flex: 1;
+    }
+
     .header-title h1 {
-      font-size: 2.2rem; font-weight: 800;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
       background: linear-gradient(135deg, #ffffff, #90e0ef, #06d6a0);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       margin: 0;
     }
-    .header-title p { color: var(--text-muted); font-size: 0.95rem; margin: 5px 0 0; }
 
-    /* HERO */
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin: 5px 0 0;
+    }
+
+    /* ====== HERO / KARTU UTAMA ====== */
     .hero {
       background: rgba(3, 4, 94, 0.55);
       backdrop-filter: blur(20px);
@@ -67,115 +98,331 @@
       padding: 40px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      margin-top: 20px;
       overflow: hidden;
       position: relative;
     }
+
     .hero::before {
       content: "";
-      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
       background: conic-gradient(from 0deg, transparent, rgba(0, 180, 216, 0.2), transparent, rgba(6, 214, 160, 0.2), transparent);
-      animation: rotateBorder 15s linear infinite; z-index: -1;
+      animation: rotateBorder 15s linear infinite;
+      z-index: -1;
     }
-    @keyframes rotateBorder { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* STEP INDICATOR */
+    @keyframes rotateBorder {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ====== STEP INDICATOR ====== */
     .step-indicator {
-      display: flex; justify-content: space-between; margin-bottom: 40px;
-      background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 50px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 50px;
       border: 1px solid var(--border);
     }
-    .step { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-muted); opacity: 0.5; transition: all 0.3s; }
-    .step.active { opacity: 1; color: #fff; }
-    .step-icon {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center;
-      font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .step.active .step-icon { background: linear-gradient(135deg, #00b4d8, #06d6a0); border: none; box-shadow: 0 4px 15px rgba(0, 180, 216, 0.5); }
 
-    /* FORM */
-    .form-section { margin-bottom: 30px; }
-    .form-section-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #fff; }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+      opacity: 0.5;
+      transition: all 0.3s ease;
+    }
+
+    .step.active {
+      opacity: 1;
+      color: #fff;
+    }
+
+    .step-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .step.active .step-icon {
+      background: linear-gradient(135deg, #00b4d8, #06d6a0);
+      border: none;
+      box-shadow: 0 4px 15px rgba(0, 180, 216, 0.5);
+    }
+
+    /* ====== KARTU FORM ====== */
+    .form-section {
+      margin-bottom: 30px;
+    }
+
+    .form-section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
     .form-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px;
-      margin-bottom: 20px; transition: all 0.3s;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
     }
-    .form-card:hover { background: var(--surface-hover); border-color: rgba(6, 214, 160, 0.5); box-shadow: 0 8px 25px rgba(6, 214, 160, 0.1); }
-    .form-label { font-size: 0.85rem; font-weight: 600; color: var(--secondary); margin-bottom: 8px; display: block; }
+
+    .form-card:hover {
+      background: var(--surface-hover);
+      border-color: rgba(6, 214, 160, 0.5);
+      box-shadow: 0 8px 25px rgba(6, 214, 160, 0.1);
+    }
+
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--secondary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
     .form-control, .form-select {
-      background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff;
-      border-radius: 12px; padding: 12px 16px; transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px 16px;
+      transition: all 0.3s;
     }
+
     .form-control:focus, .form-select:focus {
-      background: rgba(255, 255, 255, 0.15); border-color: var(--primary-light); outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--primary-light);
+      outline: none;
       box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.2);
     }
-    .form-control::placeholder { color: rgba(255, 255, 255, 0.5); }
 
-    /* CEKLIS DOKUMEN */
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ====== CEKLIS DOKUMEN ====== */
     .doc-item {
-      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px; padding: 16px; margin-bottom: 15px; transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 15px;
+      transition: all 0.3s;
     }
-    .doc-item:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(6, 214, 160, 0.3); }
-    .form-check { display: flex; align-items: center; gap: 12px; }
-    .form-check-input { width: 22px; height: 22px; background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.3); border-radius: 6px; cursor: pointer; }
-    .form-check-input:checked { background-color: var(--green); border-color: var(--green); }
-    .form-check-label { font-weight: 500; }
 
-    /* UPLOAD AREA */
+    .doc-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(6, 214, 160, 0.3);
+    }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .form-check-input {
+      width: 22px;
+      height: 22px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .form-check-input:checked {
+      background-color: var(--green);
+      border-color: var(--green);
+    }
+
+    .form-check-label {
+      font-weight: 500;
+    }
+
+    /* ====== UPLOAD AREA ====== */
     .upload-area {
-      border: 2px dashed rgba(0, 180, 216, 0.5); border-radius: 12px; padding: 20px; text-align: center;
-      cursor: pointer; transition: all 0.3s; background: rgba(0, 180, 216, 0.05); margin-top: 10px;
+      border: 2px dashed rgba(0, 180, 216, 0.5);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(0, 180, 216, 0.05);
+      margin-top: 10px;
     }
-    .upload-area:hover { border-color: var(--green); background: rgba(6, 214, 160, 0.1); transform: translateY(-2px); }
-    .upload-area svg { width: 32px; height: 32px; fill: var(--secondary); margin-bottom: 8px; }
-    .upload-status { font-size: 0.85rem; margin-top: 10px; display: block; color: var(--text-muted); }
-    .upload-status.success { color: var(--green); }
 
-    /* BUTTON */
+    .upload-area:hover {
+      border-color: var(--green);
+      background: rgba(6, 214, 160, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .upload-area svg {
+      width: 32px;
+      height: 32px;
+      fill: var(--secondary);
+      margin-bottom: 8px;
+    }
+
+    .upload-status {
+      font-size: 0.85rem;
+      margin-top: 10px;
+      display: block;
+      color: var(--text-muted);
+    }
+
+    .upload-status.success {
+      color: var(--green);
+    }
+
+    .upload-status.error {
+      color: #ff6b6b;
+    }
+
+    /* ====== PROGRESS BAR ====== */
+    .progress-upload {
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00b4d8, #06d6a0);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* ====== BUTTON ====== */
     .btn-gradient {
-      background: linear-gradient(135deg, #00b4d8, #06d6a0); border: none; color: #fff; font-weight: 700;
-      padding: 14px 32px; border-radius: 50px; box-shadow: 0 8px 25px rgba(6, 214, 160, 0.4); transition: all 0.3s;
+      background: linear-gradient(135deg, #00b4d8, #06d6a0);
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 50px;
+      box-shadow: 0 8px 25px rgba(6, 214, 160, 0.4);
+      transition: all 0.3s;
     }
-    .btn-gradient:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 35px rgba(6, 214, 160, 0.6); }
-    .btn-outline-light-custom { background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 12px 24px; border-radius: 50px; transition: all 0.3s; }
-    .btn-outline-light-custom:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--primary-light); }
 
-    /* LIST */
+    .btn-gradient:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(6, 214, 160, 0.6);
+    }
+
+    .btn-outline-light-custom {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 50px;
+      transition: all 0.3s;
+    }
+
+    .btn-outline-light-custom:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--primary-light);
+    }
+
+    /* ====== TABEL / LIST ====== */
     .list-item {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px;
-      margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s;
     }
-    .list-item:hover { background: var(--surface-hover); transform: translateX(5px); border-color: rgba(0, 180, 216, 0.4); }
-    .badge-custom { background: rgba(6, 214, 160, 0.2); color: #06d6a0; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(6, 214, 160, 0.3); }
 
-    /* ANIMASI */
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    .fade-up { animation: fadeUp 0.6s ease; }
-    .hidden { display: none !important; }
+    .list-item:hover {
+      background: var(--surface-hover);
+      transform: translateX(5px);
+      border-color: rgba(0, 180, 216, 0.4);
+    }
+
+    .badge-custom {
+      background: rgba(6, 214, 160, 0.2);
+      color: #06d6a0;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba(6, 214, 160, 0.3);
+    }
+
+    /* ====== ANIMASI ====== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up {
+      animation: fadeUp 0.6s ease;
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
+
 <div class="container">
   <!-- HEADER LOGO -->
   <div class="header">
     <div class="logo-wrapper">
-      <img src="/logo-mahakam.png" alt="Logo Kabupaten Mahakam Ulu">
+      <img src="/logo-mahakam.png" alt="Logo Kabupaten Mahakam Ulu" title="Pemerintah Kabupaten Mahakam Ulu">
     </div>
     <div class="header-title">
       <h1>Pengajuan SKBT</h1>
       <p>Surat Keterangan Bebas Temuan - Inspektorat Daerah Kabupaten Mahakam Ulu</p>
     </div>
     <div class="logo-wrapper">
-      <img src="/logo-inspektorat.png" alt="Logo Inspektorat">
+      <img src="/logo-inspektorat.png" alt="Logo Inspektorat" title="Inspektorat Daerah Kabupaten Mahakam Ulu">
     </div>
   </div>
 
   <div class="hero">
-    <div class="d-flex justify-content-end mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="form-section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;">
+            <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
+          </svg>
+          Daftar Pengajuan
+        </h4>
+      </div>
       <button class="btn-outline-light-custom" onclick="tampilkanPengajuan()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;"><path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
+          <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
+        </svg>
         Lihat Pengajuan
       </button>
     </div>
@@ -183,28 +430,46 @@
     <!-- STEP INDICATOR -->
     <div class="step-indicator">
       <div class="step active" id="step1"><span class="step-icon">1</span> Pengajuan</div>
-      <div class="step" id="step2"><span class="step-icon">2</span> Irban</div>
-      <div class="step" id="step3"><span class="step-icon">3</span> Inspektur</div>
+      <div class="step" id="step2"><span class="step-icon">2</span> Irban I</div>
+      <div class="step" id="step3"><span class="step-icon">3</span> Irban II</div>
+      <div class="step" id="step4"><span class="step-icon">4</span> Irban III</div>
+      <div class="step" id="step5"><span class="step-icon">5</span> Inspektur</div>
     </div>
 
-    <!-- FORM PENGAJUAN -->
+    <!-- ===== FORM PENGAJUAN ===== -->
     <div id="formPengajuan" class="fade-up">
       <div class="form-section">
         <h4 class="form-section-title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
           Data Pemohon
         </h4>
         <div class="row g-3">
-          <div class="col-md-6"><label class="form-label">Nama Lengkap</label><input type="text" id="nama" class="form-control" placeholder="Nama Pemohon"></div>
-          <div class="col-md-6"><label class="form-label">NIP</label><input type="text" id="nip" class="form-control" placeholder="NIP"></div>
-          <div class="col-md-6"><label class="form-label">Jabatan</label><input type="text" id="jabatan" class="form-control" placeholder="Jabatan"></div>
-          <div class="col-md-6"><label class="form-label">Unit Kerja / OPD</label><input type="text" id="unit" class="form-control" placeholder="Unit Kerja"></div>
+          <div class="col-md-6">
+            <label class="form-label">Nama Lengkap</label>
+            <input type="text" id="nama" class="form-control" placeholder="Nama Pemohon">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">NIP</label>
+            <input type="text" id="nip" class="form-control" placeholder="NIP">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Jabatan</label>
+            <input type="text" id="jabatan" class="form-control" placeholder="Jabatan">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Unit Kerja / OPD</label>
+            <input type="text" id="unit" class="form-control" placeholder="Unit Kerja">
+          </div>
         </div>
       </div>
 
       <div class="form-section">
         <h4 class="form-section-title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;">
+            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
           Dokumen yang Diperlukan
         </h4>
         <div id="daftarDokumen" class="row g-3"></div>
@@ -212,20 +477,29 @@
 
       <div class="d-flex justify-content-end mt-4">
         <button class="btn-gradient" onclick="submitPengajuan()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
           Kirim Pengajuan
         </button>
       </div>
     </div>
 
-    <!-- DAFTAR PENGAJUAN -->
+    <!-- ===== DAFTAR PENGAJUAN ===== -->
     <div id="listPengajuan" class="hidden">
       <h4 class="form-section-title">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;"><path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;">
+          <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
+        </svg>
         Daftar Pengajuan
       </h4>
       <div id="listContainer"></div>
-      <button class="btn-outline-light-custom mt-3" onclick="kembaliKeForm()">← Kembali</button>
+      <button class="btn-outline-light-custom mt-3" onclick="kembaliKeForm()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Kembali
+      </button>
     </div>
   </div>
 </div>
@@ -253,6 +527,7 @@
 
   let currentSubmissionId = null;
 
+  // ===== Render daftar dokumen =====
   function renderDokumen() {
     const container = document.getElementById('daftarDokumen');
     container.innerHTML = dokumenList.map(doc => `
@@ -260,13 +535,23 @@
         <div class="doc-item">
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="chk_${doc.code}" onchange="toggleUpload('${doc.code}')">
-            <label class="form-check-label" for="chk_${doc.code}">${doc.nama}</label>
+            <label class="form-check-label" for="chk_${doc.code}">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color:#90e0ef; margin-right:8px;">
+                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+              </svg>
+              ${doc.nama}
+            </label>
           </div>
           <div id="upload_${doc.code}" class="hidden">
             <div class="upload-area" onclick="document.getElementById('file_${doc.code}').click()">
-              <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              <svg viewBox="0 0 24 24">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+              </svg>
               <p class="mb-0">Klik untuk Upload</p>
               <input type="file" id="file_${doc.code}" style="display:none;" onchange="uploadFile('${doc.code}')">
+              <div class="progress-upload hidden" id="progress_${doc.code}">
+                <div class="progress-bar-fill" id="bar_${doc.code}"></div>
+              </div>
               <small id="status_${doc.code}" class="upload-status"></small>
             </div>
           </div>
@@ -278,15 +563,36 @@
   function toggleUpload(code) {
     const checked = document.getElementById('chk_' + code).checked;
     const uploadDiv = document.getElementById('upload_' + code);
-    if (checked) uploadDiv.classList.remove('hidden');
-    else uploadDiv.classList.add('hidden');
+    if (checked) {
+      uploadDiv.classList.remove('hidden');
+    } else {
+      uploadDiv.classList.add('hidden');
+    }
   }
 
+  // ===== Upload file dengan progress bar =====
   async function uploadFile(code) {
     const input = document.getElementById('file_' + code);
     if (!input.files.length) return;
     const file = input.files[0];
     const reader = new FileReader();
+    const progressDiv = document.getElementById('progress_' + code);
+    const bar = document.getElementById('bar_' + code);
+    const status = document.getElementById('status_' + code);
+
+    // Reset progress
+    progressDiv.classList.remove('hidden');
+    bar.style.width = '0%';
+    status.innerText = 'Uploading...';
+    status.classList.remove('success', 'error');
+
+    reader.onprogress = function(e) {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        bar.style.width = percent + '%';
+      }
+    };
+
     reader.onload = async (e) => {
       const base64 = e.target.result.split(',')[1];
       const res = await callServer('uploadDocument', {
@@ -297,16 +603,22 @@
         file_data: base64
       });
       if (res.status === 'success') {
-        const status = document.getElementById('status_' + code);
-        status.innerText = '✓ Terupload';
+        bar.style.width = '100%';
+        status.innerText = 'Terverifikasi';
         status.classList.add('success');
+        setTimeout(() => {
+          progressDiv.classList.add('hidden');
+        }, 2000);
       } else {
-        alert('Gagal upload: ' + res.msg);
+        bar.style.width = '0%';
+        status.innerText = 'Gagal: ' + res.msg;
+        status.classList.add('error');
       }
     };
     reader.readAsDataURL(file);
   }
 
+  // ===== Submit pengajuan =====
   async function submitPengajuan() {
     const nama = document.getElementById('nama').value;
     const nip = document.getElementById('nip').value;
@@ -322,7 +634,11 @@
     });
 
     const res = await callServer('submitPengajuan', {
-      nama_pemohon: nama, nip: nip, jabatan: jabatan, unit_kerja: unit, dokumen_list: docs
+      nama_pemohon: nama,
+      nip: nip,
+      jabatan: jabatan,
+      unit_kerja: unit,
+      dokumen_list: docs
     });
 
     if (res.status === 'success') {
@@ -333,6 +649,7 @@
     }
   }
 
+  // ===== Lihat daftar pengajuan =====
   async function tampilkanPengajuan() {
     document.getElementById('formPengajuan').classList.add('hidden');
     document.getElementById('listPengajuan').classList.remove('hidden');
@@ -359,5 +676,6 @@
 
   renderDokumen();
 </script>
+
 </body>
 </html>
