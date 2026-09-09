@@ -1,6 +1,4 @@
-import { getMasterData } from './sakipMasterData.js';
-
-// Helper untuk response JSON yang aman
+// Helper response JSON yang aman (CORS)
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -13,7 +11,7 @@ function jsonResponse(data, status = 200) {
   });
 }
 
-// ============ GOOGLE DRIVE INTEGRATION (OAUTH - REFRESH TOKEN) ============
+// ============ GOOGLE DRIVE INTEGRATION (Sesuai kredensial Anda) ============
 async function getGoogleAccessToken(env) {
   const { GOOGLE_DRIVE_CLIENT_ID, GOOGLE_DRIVE_CLIENT_SECRET, GOOGLE_DRIVE_REFRESH_TOKEN } = env;
   if (!GOOGLE_DRIVE_CLIENT_ID || !GOOGLE_DRIVE_CLIENT_SECRET || !GOOGLE_DRIVE_REFRESH_TOKEN) {
@@ -87,18 +85,9 @@ async function uploadToGoogleDrive(env, filePath, fileName, bytes, rootFolderId)
   if (!uploadResponse.ok) throw new Error('Gagal upload file ke Google Drive: ' + JSON.stringify(result));
   return result.id;
 }
+// ============ END GOOGLE DRIVE ============
 
-async function deleteGoogleDriveFile(env, fileId) {
-  const accessToken = await getGoogleAccessToken(env);
-  const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!response.ok && response.status !== 404) throw new Error('Gagal hapus file di Google Drive: ' + await response.text());
-}
-// ============ END GOOGLE DRIVE INTEGRATION ============
-
-// ============ MAIN HANDLER ============
+// ACTION HANDLER
 export const onRequest = async ({ request, env }) => {
   const url = new URL(request.url);
   let params = {};
@@ -127,7 +116,7 @@ export const onRequest = async ({ request, env }) => {
 
   try {
     switch (action) {
-      // ============ DAFTAR CEKLIS DOKUMEN ============
+      // ============ AMBIL DATA CEKLIS ============
       case 'getDokumenList': {
         return jsonResponse([
           { code: 'SKCPNS', nama: 'SK CPNS & PNS' },
@@ -143,7 +132,7 @@ export const onRequest = async ({ request, env }) => {
 
       // ============ SUBMIT PENGAJUAN ============
       case 'submitPengajuan': {
-        const { nama_pemohon, nip, jabatan, unit_kerja, dokumen_list } = params;
+        const { nama_pemohon, nip, jabatan, unit_kerja } = params;
         const nomor = 'SKBT-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 100);
 
         const insert = await env.DB.prepare(
@@ -152,14 +141,6 @@ export const onRequest = async ({ request, env }) => {
         ).bind(nomor, nama_pemohon, nip, jabatan, unit_kerja).run();
 
         const subId = insert.meta.last_row_id;
-
-        // Simpan dokumen yang dipilih (jika ada)
-        for (const doc of dokumen_list || []) {
-          await env.DB.prepare(
-            `INSERT INTO skbt_documents (submission_id, dokumen_code, nama_dokumen, file_name, file_url)
-             VALUES (?, ?, ?, ?, ?)`
-          ).bind(subId, doc.code, doc.nama, doc.file_name || '', doc.file_url || '').run();
-        }
 
         return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dibuat', nomor_pengajuan: nomor, id: subId });
       }
@@ -172,7 +153,7 @@ export const onRequest = async ({ request, env }) => {
 
         // Simpan ke R2
         await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
-        const publicUrl = `https://pub-xxxx.r2.dev/${r2Path}`; // Ganti dengan URL publik R2 Anda
+        const publicUrl = `https://pub-8e4e0075c2e4428e95f6455b2e2b9826.r2.dev/${r2Path}`; // Ganti dengan URL publik R2 Anda
 
         // Simpan ke Google Drive (jika dikonfigurasi)
         let gdriveId = null;
@@ -204,12 +185,10 @@ export const onRequest = async ({ request, env }) => {
       // ============ VERIFIKASI BERJENJANG ============
       case 'verifyStep': {
         const { submission_id, level, verifier_name, status, catatan } = params;
-        // Update status dan catatan di tabel pengajuan
         await env.DB.prepare(
           `UPDATE skbt_submissions SET status_verifikasi = ?, current_level = ? WHERE id = ?`
         ).bind(status, level + 1, submission_id).run();
 
-        // Log verifikasi
         await env.DB.prepare(
           `INSERT INTO skbt_verification_logs (submission_id, level_verifikasi, verifier_name, status, catatan) VALUES (?, ?, ?, ?, ?)`
         ).bind(submission_id, level, verifier_name, status, catatan).run();
