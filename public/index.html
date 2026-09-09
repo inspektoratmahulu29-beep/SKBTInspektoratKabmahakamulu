@@ -304,7 +304,7 @@
 
   // ===== LOGIKA VALIDASI UPLOAD =====
   let uploadedDocs = new Set();
-  let uploadedDocCount = {}; // Untuk melacak jumlah file per kolom
+  let uploadedDocCount = {};
 
   async function callServer(action, params = {}) {
     const res = await fetch('/skbtHandler?action=' + action, {
@@ -315,16 +315,16 @@
     return await res.json();
   }
 
+  // Daftar dokumen: SK CPNS/PNS digabung, boleh 2 file, lainnya 1 file
   const dokumenList = [
-    { code: 'SKCPNS', nama: 'SK CPNS' },
-    { code: 'SKPNS', nama: 'SK PNS' },
-    { code: 'SKPangkat', nama: 'SK Pangkat Terakhir' },
-    { code: 'SKJabatan', nama: 'SK Jabatan Terakhir' },
-    { code: 'SKP', nama: 'SKP 1 atau 2 Tahun Terakhir' },
-    { code: 'SuratPermohonan', nama: 'Surat Permohonan' },
-    { code: 'SuratPengantar', nama: 'Surat Pengantar dari Pimpinan OPD' },
-    { code: 'SKBebasMasalah', nama: 'SK Bebas Masalah' },
-    { code: 'SKBendahara', nama: 'SK Status Bebas Hutang/Piutang' }
+    { code: 'SKCPNS_PNS', nama: 'SK CPNS / PNS', maxFiles: 2 },
+    { code: 'SKPangkat', nama: 'SK Pangkat Terakhir', maxFiles: 1 },
+    { code: 'SKJabatan', nama: 'SK Jabatan Terakhir', maxFiles: 1 },
+    { code: 'SKP', nama: 'SKP 1 atau 2 Tahun Terakhir', maxFiles: 1 },
+    { code: 'SuratPermohonan', nama: 'Surat Permohonan', maxFiles: 1 },
+    { code: 'SuratPengantar', nama: 'Surat Pengantar dari Pimpinan OPD', maxFiles: 1 },
+    { code: 'SKBebasMasalah', nama: 'SK Bebas Masalah', maxFiles: 1 },
+    { code: 'SKBendahara', nama: 'SK Status Bebas Hutang/Piutang', maxFiles: 1 }
   ];
 
   let currentSubmissionId = null;
@@ -377,7 +377,7 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color:#90e0ef; margin-right:8px;">
                 <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
               </svg>
-              ${doc.nama}
+              ${doc.nama} ${doc.maxFiles > 1 ? '(maks. 2 file)' : ''}
             </label>
           </div>
           <div id="upload_${doc.code}" class="hidden">
@@ -385,7 +385,7 @@
               <svg viewBox="0 0 24 24">
                 <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
               </svg>
-              <p class="mb-0">Klik untuk Upload</p>
+              <p class="mb-0">Klik untuk Upload (${doc.maxFiles > 1 ? 'bisa 2 file' : '1 file'})</p>
               <input type="file" id="file_${doc.code}" style="display:none;" onchange="uploadFile('${doc.code}')">
               <div class="progress-upload hidden" id="progress_${doc.code}">
                 <div class="progress-bar-fill" id="bar_${doc.code}"></div>
@@ -435,16 +435,20 @@
     if (!input.files.length) return;
     const file = input.files[0];
 
-    // Batasi ukuran file 5MB
-    if (file.size > 5 * 1024 * 1024) {
-      showCustomAlert('File ' + file.name + ' melebihi 5MB! Silakan kompres atau pilih file lain.', 'error');
+    // Ambil maxFiles dari dokumen ini
+    const docInfo = dokumenList.find(d => d.code === code);
+    const maxFiles = docInfo ? docInfo.maxFiles : 1;
+
+    // Cek jumlah file sudah maksimal
+    const currentCount = uploadedDocCount[code] || 0;
+    if (currentCount >= maxFiles) {
+      showCustomAlert('Maksimal ' + maxFiles + ' file untuk ' + docInfo.nama, 'error');
       return;
     }
 
-    // Batasi maksimal 2 file per kolom
-    const currentCount = uploadedDocCount[code] || 0;
-    if (currentCount >= 2) {
-      showCustomAlert('Maksimal 2 file per kolom. File ' + file.name + ' tidak dapat diupload.', 'error');
+    // Batasi ukuran file 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      showCustomAlert('File ' + file.name + ' melebihi 5MB! Silakan kompres atau pilih file lain.', 'error');
       return;
     }
 
@@ -470,9 +474,10 @@
         const res = await callServer('uploadDocument', {
           submission_id: currentSubmissionId,
           dokumen_code: code,
-          nama_dokumen: dokumenList.find(d => d.code === code).nama,
+          nama_dokumen: docInfo.nama,
           file_name: file.name,
-          file_data: base64
+          file_data: base64,
+          nama_pemohon: namaPemohon // Kirim nama untuk penamaan R2
         });
         if (res.status === 'success') {
           bar.style.width = '100%';
@@ -512,7 +517,8 @@
       }
     });
 
-    const allUploaded = checkedCodes.every(code => uploadedDocs.has(code));
+    // Validasi semua dokumen yang dicentang sudah diupload minimal 1 file
+    const allUploaded = checkedCodes.every(code => uploadedDocs.has(code) && uploadedDocCount[code] > 0);
 
     if (!allUploaded) {
       const missingDocs = checkedCodes.filter(code => !uploadedDocs.has(code));
