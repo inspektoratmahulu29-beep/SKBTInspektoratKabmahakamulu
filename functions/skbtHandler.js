@@ -118,6 +118,31 @@ async function sendEmailNotification(env, submission, documents) {
 }
 // ============ END EMAIL ============
 
+// ============ UTILITAS UNTUK MENENTUKAN CONTENT-TYPE ============
+function getContentType(fileName) {
+  const ext = fileName.split('.').pop().toLowerCase();
+  const mimeTypes = {
+    pdf: 'application/pdf',
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    gif: 'image/gif',
+    webp: 'image/webp',
+    bmp: 'image/bmp',
+    svg: 'image/svg+xml',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xls: 'application/vnd.ms-excel',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ppt: 'application/vnd.ms-powerpoint',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    txt: 'text/plain',
+    csv: 'text/csv',
+  };
+  return mimeTypes[ext] || 'application/octet-stream';
+}
+// ============ END UTILITAS ============
+
 // ACTION HANDLER
 export const onRequest = async ({ request, env }) => {
   const url = new URL(request.url);
@@ -125,14 +150,22 @@ export const onRequest = async ({ request, env }) => {
   let action = url.searchParams.get('action') || '';
 
   if (request.method === 'OPTIONS') {
-    return new Response(null, { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' } });
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    });
   }
 
   if (request.method === 'POST') {
     try {
       params = await request.json();
       if (!action && params.action) action = params.action;
-    } catch (e) { return jsonResponse({ status: 'error', msg: 'Invalid JSON body' }); }
+    } catch (e) {
+      return jsonResponse({ status: 'error', msg: 'Invalid JSON body' });
+    }
   } else {
     url.searchParams.forEach((value, key) => { params[key] = value; });
   }
@@ -169,7 +202,10 @@ export const onRequest = async ({ request, env }) => {
           const r2Path = `skbt/${submission_id}/${dokumen_code}/${safeNama}_${Date.now()}_${file_name}`;
           const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`;
 
-          await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
+          // Tentukan Content-Type berdasarkan ekstensi file (PENTING untuk viewer)
+          const contentType = getContentType(file_name);
+
+          await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: contentType } });
 
           await env.DB.prepare(
             `INSERT INTO skbt_documents (submission_id, dokumen_code, nama_dokumen, file_name, file_url, gdrive_id)
