@@ -85,7 +85,7 @@ async function uploadToGoogleDrive(env, folderPath, fileName, bytes, rootFolderI
 }
 // ============ END GOOGLE DRIVE ============
 
-// ============ SEND EMAIL NOTIFICATION ============
+// ============ SEND EMAIL NOTIFICATION (Resend) ============
 async function sendEmailNotification(env, submission, documents) {
   if (!env.RESEND_API_KEY || !env.ADMIN_EMAIL) return;
   try {
@@ -137,7 +137,7 @@ export const onRequest = async ({ request, env }) => {
 
   try {
     switch (action) {
-      // ============ STEP 1: SUBMIT PENGAJUAN ============
+      // ============ STEP 1: SUBMIT PENGAJUAN (TANPA EMAIL, TANPA DRIVE) ============
       case 'submitPengajuan': {
         const { nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail } = params;
         const nomor = 'SKBT-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 100);
@@ -157,20 +157,17 @@ export const onRequest = async ({ request, env }) => {
         const { submission_id, dokumen_code, nama_dokumen, file_name, file_data } = params;
         
         try {
-          // Batasi ukuran file 5MB
+          // **PENTING: Batas ukuran file 5MB** (Base64 membuat file jadi ~33% lebih besar)
           const decoded = atob(file_data);
           const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
           if (bytes.length > 5 * 1024 * 1024) {
             return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 5MB.' });
           }
 
-          // Cek jumlah file yang sudah diupload untuk kriteria ini
-          const existing = await env.DB.prepare("SELECT COUNT(*) as count FROM skbt_documents WHERE submission_id = ? AND dokumen_code = ?").bind(submission_id, dokumen_code).first();
-          if (existing && existing.count >= 2) {
-            return jsonResponse({ status: 'error', msg: 'Maksimal 2 file per kriteria!' });
-          }
-
           const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
+          
+          // Ganti URL R2 dengan URL yang benar dan SUDAH PUBLIK!
+          // Pastikan R2 bucket Anda sudah diaktifkan "Public Access"
           const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`;
 
           // Simpan ke R2
@@ -199,7 +196,7 @@ export const onRequest = async ({ request, env }) => {
         const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(submission_id).all();
         const documents = docs.results;
 
-        // Upload semua dokumen ke Google Drive
+        // Upload semua dokumen ke Google Drive satu per satu (untuk mencegah timeout)
         for (const doc of documents) {
           if (doc.file_url && doc.file_url.includes('r2.dev/')) {
             try {
@@ -211,8 +208,6 @@ export const onRequest = async ({ request, env }) => {
                 const gdriveId = await uploadToGoogleDrive(env, `${nama_pemohon}/${doc.dokumen_code}`, doc.file_name, bytes, env.GOOGLE_DRIVE_FOLDER_ID);
               
                 await env.DB.prepare("UPDATE skbt_documents SET gdrive_id = ? WHERE id = ?").bind(gdriveId, doc.id).run();
-              } else {
-                console.error('File tidak ditemukan di R2 untuk:', doc.file_name);
               }
             } catch (e) {
               console.error('Gagal upload ke Drive:', doc.file_name, e.message);
