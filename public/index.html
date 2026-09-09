@@ -40,10 +40,7 @@
       100% { background-position: 0% 50%; }
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1200px; margin: 0 auto; }
 
     /* ====== HEADER ====== */
     .header {
@@ -57,38 +54,16 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .logo-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
+    .logo-wrapper { display: flex; align-items: center; gap: 20px; }
+    .logo-wrapper img { width: 80px; height: 80px; object-fit: contain; }
 
-    .logo-wrapper img {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-    }
-
-    .header-title {
-      text-align: center;
-      flex: 1;
-    }
-
+    .header-title { text-align: center; flex: 1; }
     .header-title h1 {
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
+      font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;
       background: linear-gradient(135deg, #ffffff, #90e0ef, #06d6a0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin: 0;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;
     }
-
-    .header-title p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin: 5px 0 0;
-    }
+    .header-title p { color: var(--text-muted); font-size: 0.95rem; margin: 5px 0 0; }
 
     /* ====== HERO ====== */
     .hero {
@@ -104,15 +79,10 @@
     }
 
     .hero::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
+      content: ""; position: absolute; top: -50%; left: -50%;
+      width: 200%; height: 200%;
       background: conic-gradient(from 0deg, transparent, rgba(0, 180, 216, 0.2), transparent, rgba(6, 214, 160, 0.2), transparent);
-      animation: rotateBorder 15s linear infinite;
-      z-index: -1;
+      animation: rotateBorder 15s linear infinite; z-index: -1;
     }
 
     @keyframes rotateBorder {
@@ -122,303 +92,164 @@
 
     /* ====== STEP INDICATOR ====== */
     .step-indicator {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 40px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 15px;
-      border-radius: 50px;
-      border: 1px solid var(--border);
+      display: flex; justify-content: space-between; margin-bottom: 40px;
+      background: rgba(255, 255, 255, 0.05); padding: 15px;
+      border-radius: 50px; border: 1px solid var(--border);
     }
 
     .step {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      color: var(--text-muted);
-      opacity: 0.5;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: var(--text-muted); opacity: 0.5;
       transition: all 0.3s ease;
     }
 
-    .step.active {
-      opacity: 1;
-      color: #fff;
-    }
+    .step.active { opacity: 1; color: #fff; }
 
     .step-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      width: 36px; height: 36px; border-radius: 50%;
       background: rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .step.active .step-icon {
       background: linear-gradient(135deg, #00b4d8, #06d6a0);
-      border: none;
-      box-shadow: 0 4px 15px rgba(0, 180, 216, 0.5);
+      border: none; box-shadow: 0 4px 15px rgba(0, 180, 216, 0.5);
     }
 
     /* ====== FORM SECTION ====== */
-    .form-section {
-      margin-bottom: 30px;
-    }
-
+    .form-section { margin-bottom: 30px; }
     .form-section-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #fff;
+      font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px; color: #fff;
     }
 
-    .form-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 20px;
-      transition: all 0.3s ease;
-    }
-
-    .form-card:hover {
-      background: var(--surface-hover);
-      border-color: rgba(6, 214, 160, 0.5);
-      box-shadow: 0 8px 25px rgba(6, 214, 160, 0.1);
-    }
-
-    .form-label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--secondary);
-      margin-bottom: 8px;
-      display: block;
-    }
-
+    .form-label { font-size: 0.85rem; font-weight: 600; color: var(--secondary); margin-bottom: 8px; display: block; }
     .form-control, .form-select {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      border-radius: 12px;
-      padding: 12px 16px;
-      transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff; border-radius: 12px; padding: 12px 16px; transition: all 0.3s;
     }
-
     .form-control:focus, .form-select:focus {
       background: rgba(255, 255, 255, 0.15);
-      border-color: var(--primary-light);
-      outline: none;
+      border-color: var(--primary-light); outline: none;
       box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.2);
     }
-
-    .form-control::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
+    .form-control::placeholder { color: rgba(255, 255, 255, 0.5); }
 
     /* ====== CEKLIS DOKUMEN ====== */
     .doc-item {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 15px;
-      transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px; padding: 16px; margin-bottom: 15px; transition: all 0.3s;
     }
+    .doc-item:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(6, 214, 160, 0.3); }
 
-    .doc-item:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(6, 214, 160, 0.3);
-    }
-
-    .form-check {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .form-check { display: flex; align-items: center; gap: 12px; }
     .form-check-input {
-      width: 22px;
-      height: 22px;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.3);
-      border-radius: 6px;
-      cursor: pointer;
+      width: 22px; height: 22px; background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3); border-radius: 6px; cursor: pointer;
     }
-
-    .form-check-input:checked {
-      background-color: var(--green);
-      border-color: var(--green);
-    }
-
-    .form-check-label {
-      font-weight: 500;
-    }
+    .form-check-input:checked { background-color: var(--green); border-color: var(--green); }
+    .form-check-label { font-weight: 500; }
 
     /* ====== UPLOAD AREA ====== */
     .upload-area {
-      border: 2px dashed rgba(0, 180, 216, 0.5);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      background: rgba(0, 180, 216, 0.05);
-      margin-top: 10px;
+      border: 2px dashed rgba(0, 180, 216, 0.5); border-radius: 12px;
+      padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;
+      background: rgba(0, 180, 216, 0.05); margin-top: 10px;
     }
+    .upload-area:hover { border-color: var(--green); background: rgba(6, 214, 160, 0.1); transform: translateY(-2px); }
+    .upload-area svg { width: 32px; height: 32px; fill: var(--secondary); margin-bottom: 8px; }
 
-    .upload-area:hover {
-      border-color: var(--green);
-      background: rgba(6, 214, 160, 0.1);
-      transform: translateY(-2px);
-    }
+    .upload-status { font-size: 0.85rem; margin-top: 10px; display: block; color: var(--text-muted); }
+    .upload-status.success { color: var(--green); }
+    .upload-status.error { color: #ff6b6b; }
 
-    .upload-area svg {
-      width: 32px;
-      height: 32px;
-      fill: var(--secondary);
-      margin-bottom: 8px;
-    }
-
-    .upload-status {
-      font-size: 0.85rem;
-      margin-top: 10px;
-      display: block;
-      color: var(--text-muted);
-    }
-
-    .upload-status.success {
-      color: var(--green);
-    }
-
-    .upload-status.error {
-      color: #ff6b6b;
-    }
-
-    .progress-upload {
-      height: 8px;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #00b4d8, #06d6a0);
-      width: 0%;
-      transition: width 0.3s ease;
-    }
+    .progress-upload { height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #00b4d8, #06d6a0); width: 0%; transition: width 0.3s ease; }
 
     /* ====== RIWAYAT UPLOAD ====== */
-    .file-history {
-      margin-top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
+    .file-history { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
     .file-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 0.85rem;
+      display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.1);
+      padding: 8px; border-radius: 8px; font-size: 0.85rem;
     }
+    .file-item a { color: #90e0ef; text-decoration: none; }
+    .file-item a:hover { color: #06d6a0; }
 
-    .file-item a {
-      color: #90e0ef;
-      text-decoration: none;
-    }
-
-    .file-item a:hover {
-      color: #06d6a0;
-    }
-
-    /* ====== BUTTON ====== */
+    /* ====== BUTTONS ====== */
     .btn-gradient {
-      background: linear-gradient(135deg, #00b4d8, #06d6a0);
-      border: none;
-      color: #fff;
-      font-weight: 700;
-      padding: 14px 32px;
-      border-radius: 50px;
-      box-shadow: 0 8px 25px rgba(6, 214, 160, 0.4);
-      transition: all 0.3s;
+      background: linear-gradient(135deg, #00b4d8, #06d6a0); border: none; color: #fff;
+      font-weight: 700; padding: 14px 32px; border-radius: 50px;
+      box-shadow: 0 8px 25px rgba(6, 214, 160, 0.4); transition: all 0.3s;
     }
-
-    .btn-gradient:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 12px 35px rgba(6, 214, 160, 0.6);
-    }
+    .btn-gradient:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 35px rgba(6, 214, 160, 0.6); }
 
     .btn-outline-light-custom {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 50px;
-      transition: all 0.3s;
+      background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff;
+      padding: 12px 24px; border-radius: 50px; transition: all 0.3s;
     }
-
-    .btn-outline-light-custom:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--primary-light);
-    }
+    .btn-outline-light-custom:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--primary-light); }
 
     /* ====== LIST ====== */
     .list-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.3s;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between;
+      align-items: center; transition: all 0.3s;
     }
-
-    .list-item:hover {
-      background: var(--surface-hover);
-      transform: translateX(5px);
-      border-color: rgba(0, 180, 216, 0.4);
-    }
-
+    .list-item:hover { background: var(--surface-hover); transform: translateX(5px); border-color: rgba(0, 180, 216, 0.4); }
     .badge-custom {
-      background: rgba(6, 214, 160, 0.2);
-      color: #06d6a0;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      border: 1px solid rgba(6, 214, 160, 0.3);
+      background: rgba(6, 214, 160, 0.2); color: #06d6a0; padding: 6px 12px;
+      border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(6, 214, 160, 0.3);
     }
 
     /* ====== ANIMASI ====== */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s ease; }
+    .hidden { display: none !important; }
 
-    .fade-up {
-      animation: fadeUp 0.6s ease;
+    /* ====== MODERN MODAL ====== */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
+      z-index: 9999; display: flex; justify-content: center; align-items: center;
+      opacity: 0; visibility: hidden; transition: all 0.3s ease;
     }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
 
-    .hidden {
-      display: none !important;
+    .custom-modal {
+      background: linear-gradient(135deg, #0f2027, #203a43);
+      border: 2px solid var(--green); border-radius: 20px; padding: 30px;
+      max-width: 420px; width: 90%; text-align: center;
+      transform: scale(0.9); transition: transform 0.3s ease;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
     }
+    .modal-overlay.active .custom-modal { transform: scale(1); }
+
+    .modal-icon {
+      width: 60px; height: 60px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 15px;
+    }
+    .modal-icon.success { background: rgba(6,214,160,0.2); color: var(--green); border: 1px solid var(--green); }
+    .modal-icon.error { background: rgba(255,107,107,0.2); color: #ff6b6b; border: 1px solid #ff6b6b; }
+    .modal-icon.info { background: rgba(0,180,216,0.2); color: var(--primary-light); border: 1px solid var(--primary-light); }
+
+    .modal-text { font-size: 1.1rem; color: #fff; margin-bottom: 25px; font-weight: 500; }
+    .modal-actions { display: flex; justify-content: center; gap: 10px; }
   </style>
 </head>
 <body>
+
+<!-- MODAL MODERN -->
+<div class="modal-overlay" id="customAlertModal">
+  <div class="custom-modal">
+    <div class="modal-icon" id="modalIcon"></div>
+    <p class="modal-text" id="modalText">Pesan</p>
+    <div class="modal-actions">
+      <button class="btn-gradient" onclick="closeModal()">OK, Mengerti</button>
+    </div>
+  </div>
+</div>
 
 <div class="container">
   <!-- HEADER LOGO -->
@@ -446,9 +277,6 @@
         </h4>
       </div>
       <button class="btn-outline-light-custom" onclick="tampilkanPengajuan()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
-          <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
-        </svg>
         Lihat Pengajuan
       </button>
     </div>
@@ -543,6 +371,32 @@
 </div>
 
 <script>
+  // ===== FUNGSI MODAL MODERN =====
+  function showCustomAlert(message, type = 'info') {
+    const overlay = document.getElementById('customAlertModal');
+    const icon = document.getElementById('modalIcon');
+    const text = document.getElementById('modalText');
+
+    text.innerText = message;
+    icon.className = 'modal-icon ' + type;
+
+    let svgContent = '';
+    if (type === 'success') {
+      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+    } else if (type === 'error') {
+      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+    } else {
+      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+    }
+
+    icon.innerHTML = svgContent;
+    overlay.classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('customAlertModal').classList.remove('active');
+  }
+
   async function callServer(action, params = {}) {
     const res = await fetch('/skbtHandler?action=' + action, {
       method: 'POST',
@@ -552,7 +406,6 @@
     return await res.json();
   }
 
-  // ===== PERUBAHAN DI SINI: PISAHKAN SK CPNS & SK PNS =====
   const dokumenList = [
     { code: 'SKCPNS', nama: 'SK CPNS' },
     { code: 'SKPNS', nama: 'SK PNS' },
@@ -712,6 +565,7 @@
     document.getElementById('halaman3').classList.remove('hidden');
     document.getElementById('step2').classList.remove('active');
     document.getElementById('step3').classList.add('active');
+
     showCustomAlert('Pengajuan Anda berhasil dikirim! Notifikasi email telah dikirim ke Admin.', 'success');
   }
 
@@ -750,32 +604,6 @@
   function kembaliKeFormAwal() {
     document.getElementById('listPengajuan').classList.add('hidden');
     document.getElementById('halaman1').classList.remove('hidden');
-  }
-
-  // ===== MODAL ALERT (JANGAN LUPA) =====
-  function showCustomAlert(message, type = 'info') {
-    const overlay = document.getElementById('customAlertModal');
-    const icon = document.getElementById('modalIcon');
-    const text = document.getElementById('modalText');
-
-    text.innerText = message;
-    icon.className = 'modal-icon ' + type;
-
-    let svgContent = '';
-    if (type === 'success') {
-      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
-    } else if (type === 'error') {
-      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
-    } else {
-      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
-    }
-
-    icon.innerHTML = svgContent;
-    overlay.classList.add('active');
-  }
-
-  function closeModal() {
-    document.getElementById('customAlertModal').classList.remove('active');
   }
 
   // Inisialisasi
