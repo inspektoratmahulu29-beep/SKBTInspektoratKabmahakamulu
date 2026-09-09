@@ -7,235 +7,84 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-
-    :root {
-      --primary: #0077b6;
-      --primary-light: #00b4d8;
-      --secondary: #90e0ef;
-      --dark: #03045e;
-      --green: #06d6a0;
-      --green-dark: #118ab2;
-      --white: #ffffff;
-      --surface: rgba(255, 255, 255, 0.05);
-      --surface-hover: rgba(255, 255, 255, 0.1);
-      --border: rgba(255, 255, 255, 0.15);
-      --text: #f8f9fa;
-      --text-muted: #adb5bd;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: linear-gradient(135deg, #03045e, #0077b6, #00b4d8, #06d6a0);
-      background-size: 400% 400%;
-      animation: gradientBG 12s ease infinite;
-      color: var(--text);
-      min-height: 100vh;
-      padding: 30px;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
+    :root { --primary: #0077b6; --primary-light: #00b4d8; --secondary: #90e0ef; --dark: #03045e; --green: #06d6a0; --green-dark: #118ab2; --white: #ffffff; --surface: rgba(255, 255, 255, 0.05); --surface-hover: rgba(255, 255, 255, 0.1); --border: rgba(255, 255, 255, 0.15); --text: #f8f9fa; --text-muted: #adb5bd; }
+    body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #03045e, #0077b6, #00b4d8, #06d6a0); background-size: 400% 400%; animation: gradientBG 12s ease infinite; color: var(--text); min-height: 100vh; padding: 30px; }
+    @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     .container { max-width: 1200px; margin: 0 auto; }
-
-    /* ====== HEADER ====== */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 20px;
-      padding: 15px 25px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: rgba(0, 0, 0, 0.2); border-radius: 20px; padding: 15px 25px; border: 1px solid rgba(255, 255, 255, 0.1); }
     .logo-wrapper { display: flex; align-items: center; gap: 20px; }
     .logo-wrapper img { width: 80px; height: 80px; object-fit: contain; }
-
     .header-title { text-align: center; flex: 1; }
-    .header-title h1 {
-      font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #ffffff, #90e0ef, #06d6a0);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;
-    }
+    .header-title h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #ffffff, #90e0ef, #06d6a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
     .header-title p { color: var(--text-muted); font-size: 0.95rem; margin: 5px 0 0; }
-
-    /* ====== HERO ====== */
-    .hero {
-      background: rgba(3, 4, 94, 0.55);
-      backdrop-filter: blur(20px);
-      border-radius: 32px;
-      padding: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-      margin-top: 20px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .hero::before {
-      content: ""; position: absolute; top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: conic-gradient(from 0deg, transparent, rgba(0, 180, 216, 0.2), transparent, rgba(6, 214, 160, 0.2), transparent);
-      animation: rotateBorder 15s linear infinite; z-index: -1;
-    }
-
-    @keyframes rotateBorder {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* ====== STEP INDICATOR ====== */
-    .step-indicator {
-      display: flex; justify-content: space-between; margin-bottom: 40px;
-      background: rgba(255, 255, 255, 0.05); padding: 15px;
-      border-radius: 50px; border: 1px solid var(--border);
-    }
-
-    .step {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 14px; color: var(--text-muted); opacity: 0.5;
-      transition: all 0.3s ease;
-    }
-
+    .hero { background: rgba(3, 4, 94, 0.55); backdrop-filter: blur(20px); border-radius: 32px; padding: 40px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5); margin-top: 20px; overflow: hidden; position: relative; }
+    .hero::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, rgba(0, 180, 216, 0.2), transparent, rgba(6, 214, 160, 0.2), transparent); animation: rotateBorder 15s linear infinite; z-index: -1; }
+    @keyframes rotateBorder { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .step-indicator { display: flex; justify-content: space-between; margin-bottom: 40px; background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 50px; border: 1px solid var(--border); }
+    .step { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-muted); opacity: 0.5; transition: all 0.3s ease; }
     .step.active { opacity: 1; color: #fff; }
-
-    .step-icon {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .step.active .step-icon {
-      background: linear-gradient(135deg, #00b4d8, #06d6a0);
-      border: none; box-shadow: 0 4px 15px rgba(0, 180, 216, 0.5);
-    }
-
-    /* ====== FORM SECTION ====== */
+    .step-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.2); }
+    .step.active .step-icon { background: linear-gradient(135deg, #00b4d8, #06d6a0); border: none; box-shadow: 0 4px 15px rgba(0, 180, 216, 0.5); }
     .form-section { margin-bottom: 30px; }
-    .form-section-title {
-      font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;
-      display: flex; align-items: center; gap: 10px; color: #fff;
-    }
-
+    .form-section-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #fff; }
     .form-label { font-size: 0.85rem; font-weight: 600; color: var(--secondary); margin-bottom: 8px; display: block; }
-    .form-control, .form-select {
-      background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff; border-radius: 12px; padding: 12px 16px; transition: all 0.3s;
-    }
-    .form-control:focus, .form-select:focus {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: var(--primary-light); outline: none;
-      box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.2);
-    }
+    .form-control, .form-select { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; border-radius: 12px; padding: 12px 16px; transition: all 0.3s; }
+    .form-control:focus, .form-select:focus { background: rgba(255, 255, 255, 0.15); border-color: var(--primary-light); outline: none; box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.2); }
     .form-control::placeholder { color: rgba(255, 255, 255, 0.5); }
-
-    /* ====== CEKLIS DOKUMEN ====== */
-    .doc-item {
-      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px; padding: 16px; margin-bottom: 15px; transition: all 0.3s;
-    }
+    .doc-item { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px; margin-bottom: 15px; transition: all 0.3s; }
     .doc-item:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(6, 214, 160, 0.3); }
-
     .form-check { display: flex; align-items: center; gap: 12px; }
-    .form-check-input {
-      width: 22px; height: 22px; background-color: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.3); border-radius: 6px; cursor: pointer;
-    }
+    .form-check-input { width: 22px; height: 22px; background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.3); border-radius: 6px; cursor: pointer; }
     .form-check-input:checked { background-color: var(--green); border-color: var(--green); }
     .form-check-label { font-weight: 500; }
-
-    /* ====== UPLOAD AREA ====== */
-    .upload-area {
-      border: 2px dashed rgba(0, 180, 216, 0.5); border-radius: 12px;
-      padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;
-      background: rgba(0, 180, 216, 0.05); margin-top: 10px;
-    }
+    .upload-area { border: 2px dashed rgba(0, 180, 216, 0.5); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(0, 180, 216, 0.05); margin-top: 10px; }
     .upload-area:hover { border-color: var(--green); background: rgba(6, 214, 160, 0.1); transform: translateY(-2px); }
     .upload-area svg { width: 32px; height: 32px; fill: var(--secondary); margin-bottom: 8px; }
-
     .upload-status { font-size: 0.85rem; margin-top: 10px; display: block; color: var(--text-muted); }
+    .upload-status.staged { color: #ffd166; }
     .upload-status.success { color: var(--green); }
     .upload-status.error { color: #ff6b6b; }
-
     .progress-upload { height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden; margin-top: 10px; }
     .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #00b4d8, #06d6a0); width: 0%; transition: width 0.3s ease; }
-
-    /* ====== RIWAYAT UPLOAD ====== */
     .file-history { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .file-item {
-      display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.1);
-      padding: 8px; border-radius: 8px; font-size: 0.85rem;
-    }
+    .file-item { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px; font-size: 0.85rem; }
     .file-item a { color: #90e0ef; text-decoration: none; }
     .file-item a:hover { color: #06d6a0; }
-
-    /* ====== BUTTONS ====== */
-    .btn-gradient {
-      background: linear-gradient(135deg, #00b4d8, #06d6a0); border: none; color: #fff;
-      font-weight: 700; padding: 14px 32px; border-radius: 50px;
-      box-shadow: 0 8px 25px rgba(6, 214, 160, 0.4); transition: all 0.3s;
-    }
+    .btn-gradient { background: linear-gradient(135deg, #00b4d8, #06d6a0); border: none; color: #fff; font-weight: 700; padding: 14px 32px; border-radius: 50px; box-shadow: 0 8px 25px rgba(6, 214, 160, 0.4); transition: all 0.3s; }
     .btn-gradient:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 35px rgba(6, 214, 160, 0.6); }
-
-    .btn-outline-light-custom {
-      background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff;
-      padding: 12px 24px; border-radius: 50px; transition: all 0.3s;
-    }
+    .btn-outline-light-custom { background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 12px 24px; border-radius: 50px; transition: all 0.3s; }
     .btn-outline-light-custom:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--primary-light); }
-
-    /* ====== LIST ====== */
-    .list-item {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-      padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between;
-      align-items: center; transition: all 0.3s;
-    }
+    .list-item { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
     .list-item:hover { background: var(--surface-hover); transform: translateX(5px); border-color: rgba(0, 180, 216, 0.4); }
-    .badge-custom {
-      background: rgba(6, 214, 160, 0.2); color: #06d6a0; padding: 6px 12px;
-      border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(6, 214, 160, 0.3);
-    }
-
-    /* ====== ANIMASI ====== */
+    .badge-custom { background: rgba(6, 214, 160, 0.2); color: #06d6a0; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(6, 214, 160, 0.3); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     .fade-up { animation: fadeUp 0.6s ease; }
     .hidden { display: none !important; }
-
-    /* ====== MODERN MODAL ====== */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
-      z-index: 9999; display: flex; justify-content: center; align-items: center;
-      opacity: 0; visibility: hidden; transition: all 0.3s ease;
-    }
+    
+    /* MODAL MODERN */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
     .modal-overlay.active { opacity: 1; visibility: visible; }
-
-    .custom-modal {
-      background: linear-gradient(135deg, #0f2027, #203a43);
-      border: 2px solid var(--green); border-radius: 20px; padding: 30px;
-      max-width: 420px; width: 90%; text-align: center;
-      transform: scale(0.9); transition: transform 0.3s ease;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-    }
+    .custom-modal { background: linear-gradient(135deg, #0f2027, #203a43); border: 2px solid var(--green); border-radius: 20px; padding: 30px; max-width: 420px; width: 90%; text-align: center; transform: scale(0.9); transition: transform 0.3s ease; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
     .modal-overlay.active .custom-modal { transform: scale(1); }
-
-    .modal-icon {
-      width: 60px; height: 60px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 15px;
-    }
+    .modal-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; }
     .modal-icon.success { background: rgba(6,214,160,0.2); color: var(--green); border: 1px solid var(--green); }
     .modal-icon.error { background: rgba(255,107,107,0.2); color: #ff6b6b; border: 1px solid #ff6b6b; }
     .modal-icon.info { background: rgba(0,180,216,0.2); color: var(--primary-light); border: 1px solid var(--primary-light); }
-
     .modal-text { font-size: 1.1rem; color: #fff; margin-bottom: 25px; font-weight: 500; }
     .modal-actions { display: flex; justify-content: center; gap: 10px; }
+
+    /* CAPTCHA */
+    .captcha-box { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-top: 20px; }
+    .captcha-question { font-size: 1.2rem; font-weight: 700; color: #ffd166; }
+    .captcha-input { width: 80px; text-align: center; }
+    
+    /* PROGRESS OVERLAY */
+    .progress-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 4, 94, 0.85); z-index: 9998; display: flex; justify-content: center; align-items: center; flex-direction: column; opacity: 0; visibility: hidden; transition: all 0.3s; }
+    .progress-overlay.active { opacity: 1; visibility: visible; }
+    .progress-container { width: 80%; max-width: 500px; background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 30px; text-align: center; border: 2px solid var(--green); }
+    .progress-bar-big { height: 20px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; overflow: hidden; margin: 20px 0; }
+    .progress-bar-big-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00b4d8, #06d6a0); transition: width 0.3s ease; }
+    .progress-text { font-size: 1.2rem; font-weight: 700; color: #fff; }
   </style>
 </head>
 <body>
@@ -248,6 +97,15 @@
     <div class="modal-actions">
       <button class="btn-gradient" onclick="closeModal()">OK, Mengerti</button>
     </div>
+  </div>
+</div>
+
+<!-- PROGRESS OVERLAY -->
+<div class="progress-overlay" id="progressOverlay">
+  <div class="progress-container">
+    <h3 style="color: #fff;">Sedang Mengirim Pengajuan...</h3>
+    <div class="progress-bar-big"><div class="progress-bar-big-fill" id="progressBarBigFill"></div></div>
+    <div class="progress-text" id="progressText">0%</div>
   </div>
 </div>
 
@@ -277,6 +135,9 @@
         </h4>
       </div>
       <button class="btn-outline-light-custom" onclick="tampilkanPengajuan()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
+          <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
+        </svg>
         Lihat Pengajuan
       </button>
     </div>
@@ -341,6 +202,14 @@
         <button class="btn-outline-light-custom" onclick="kembaliKeHalaman1()">← Kembali</button>
       </div>
       <div id="daftarDokumen" class="row g-3"></div>
+      
+      <!-- CAPTCHA -->
+      <div class="captcha-box">
+        <span class="captcha-question" id="captchaQuestion">3 + 4 = ?</span>
+        <input type="number" id="captchaInput" class="form-control captcha-input" placeholder="?">
+        <button class="btn-outline-light-custom btn-sm" onclick="generateCaptcha()">🔄</button>
+      </div>
+
       <div class="d-flex justify-content-end mt-4">
         <button class="btn-gradient" onclick="submitAkhir()">Kirim Pengajuan</button>
       </div>
@@ -352,7 +221,8 @@
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
       </svg>
       <h3 class="mt-3">Pengajuan Berhasil Dikirim!</h3>
-      <p class="text-muted">Notifikasi email telah dikirim ke Admin.</p>
+      <h4 class="text-warning mt-3" id="nomorSKBT" style="font-size: 1.5rem; font-weight: 800; letter-spacing: 1px;"></h4>
+      <p class="text-muted mt-2">Notifikasi email telah dikirim ke Admin. Dokumen telah diupload ke Google Drive.</p>
       <button class="btn-gradient mt-3" onclick="resetForm()">Buat Pengajuan Baru</button>
     </div>
 
@@ -397,6 +267,32 @@
     document.getElementById('customAlertModal').classList.remove('active');
   }
 
+  // ===== FUNGSI PROGRESS OVERLAY =====
+  function showProgressOverlay() {
+    document.getElementById('progressOverlay').classList.add('active');
+    document.getElementById('progressBarBigFill').style.width = '0%';
+    document.getElementById('progressText').innerText = '0%';
+  }
+  
+  function updateProgress(percent) {
+    document.getElementById('progressBarBigFill').style.width = percent + '%';
+    document.getElementById('progressText').innerText = percent + '%';
+  }
+
+  function hideProgressOverlay() {
+    document.getElementById('progressOverlay').classList.remove('active');
+  }
+
+  // ===== CAPTCHA =====
+  let captchaResult = 0;
+  function generateCaptcha() {
+    const num1 = Math.floor(Math.random() * 9) + 1;
+    const num2 = Math.floor(Math.random() * 9) + 1;
+    captchaResult = num1 + num2;
+    document.getElementById('captchaQuestion').innerText = num1 + ' + ' + num2 + ' = ?';
+    document.getElementById('captchaInput').value = '';
+  }
+
   async function callServer(action, params = {}) {
     const res = await fetch('/skbtHandler?action=' + action, {
       method: 'POST',
@@ -434,6 +330,7 @@
       return;
     }
 
+    // STEP 1: Simpan data pemohon (TANPA EMAIL)
     const res = await callServer('submitPengajuan', {
       nama_pemohon: nama, nip: nip, jabatan: jabatan, unit_kerja: unit, nomor_hp: nomor_hp, gmail: gmail
     });
@@ -446,7 +343,8 @@
       document.getElementById('step1').classList.remove('active');
       document.getElementById('step2').classList.add('active');
       renderDokumen();
-      showCustomAlert('Pengajuan dibuat! Nomor: ' + res.nomor_pengajuan + '. Silakan upload dokumen.', 'success');
+      generateCaptcha(); // Generate captcha saat masuk halaman 2
+      showCustomAlert('Data tersimpan! Silakan upload dokumen.', 'success');
     } else {
       showCustomAlert('Gagal: ' + res.msg, 'error');
     }
@@ -527,7 +425,7 @@
     progressDiv.classList.remove('hidden');
     bar.style.width = '0%';
     status.innerText = 'Uploading...';
-    status.classList.remove('success', 'error');
+    status.classList.remove('success', 'error', 'staged');
 
     reader.onprogress = function(e) {
       if (e.lengthComputable) {
@@ -537,18 +435,18 @@
 
     reader.onload = async (e) => {
       const base64 = e.target.result.split(',')[1];
+      // STEP 2: Upload ke R2 saja (Staging), TANPA Drive
       const res = await callServer('uploadDocument', {
         submission_id: currentSubmissionId,
         dokumen_code: code,
         nama_dokumen: dokumenList.find(d => d.code === code).nama,
         file_name: file.name,
-        file_data: base64,
-        nama_pemohon: namaPemohon
+        file_data: base64
       });
       if (res.status === 'success') {
         bar.style.width = '100%';
-        status.innerText = 'Terverifikasi';
-        status.classList.add('success');
+        status.innerText = 'Tersimpan (Menunggu Finalisasi)'; // Ubah status agar tidak menyesatkan
+        status.classList.add('staged');
         setTimeout(() => progressDiv.classList.add('hidden'), 2000);
         renderFileHistory(code);
       } else {
@@ -560,13 +458,44 @@
     reader.readAsDataURL(file);
   }
 
-  function submitAkhir() {
-    document.getElementById('halaman2').classList.add('hidden');
-    document.getElementById('halaman3').classList.remove('hidden');
-    document.getElementById('step2').classList.remove('active');
-    document.getElementById('step3').classList.add('active');
+  // ===== SUBMIT AKHIR DENGAN PROGRESS BAR & CAPTCHA =====
+  async function submitAkhir() {
+    // Validasi CAPTCHA
+    const captchaInput = document.getElementById('captchaInput').value;
+    if (parseInt(captchaInput) !== captchaResult) {
+      showCustomAlert('Captcha salah! Silakan coba lagi.', 'error');
+      generateCaptcha();
+      return;
+    }
 
-    showCustomAlert('Pengajuan Anda berhasil dikirim! Notifikasi email telah dikirim ke Admin.', 'success');
+    // Tampilkan Progress Overlay
+    showProgressOverlay();
+    updateProgress(10);
+
+    // Panggil finalizeSubmission (Upload Drive + Kirim Email)
+    const res = await callServer('finalizeSubmission', {
+      submission_id: currentSubmissionId,
+      nama_pemohon: namaPemohon
+    });
+
+    updateProgress(80);
+
+    if (res.status === 'success') {
+      updateProgress(100);
+      setTimeout(() => {
+        hideProgressOverlay();
+        document.getElementById('halaman2').classList.add('hidden');
+        document.getElementById('halaman3').classList.remove('hidden');
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step3').classList.add('active');
+        // Tampilkan Nomor SKBT di Halaman 3
+        document.getElementById('nomorSKBT').innerText = res.nomor_pengajuan;
+        showCustomAlert('Pengajuan berhasil dikirim! Dokumen telah diupload ke Drive.', 'success');
+      }, 500);
+    } else {
+      hideProgressOverlay();
+      showCustomAlert('Gagal: ' + res.msg, 'error');
+    }
   }
 
   function resetForm() {
@@ -608,6 +537,7 @@
 
   // Inisialisasi
   document.getElementById('daftarDokumen').innerHTML = '';
+  generateCaptcha();
 </script>
 
 </body>
