@@ -12,11 +12,13 @@ function jsonResponse(data, status = 200) {
 }
 
 // ============ GOOGLE DRIVE INTEGRATION ============
+// Fungsi untuk mendapatkan akses token dari Google Drive
 async function getGoogleAccessToken(env) {
   const { GOOGLE_DRIVE_CLIENT_ID, GOOGLE_DRIVE_CLIENT_SECRET, GOOGLE_DRIVE_REFRESH_TOKEN } = env;
   if (!GOOGLE_DRIVE_CLIENT_ID || !GOOGLE_DRIVE_CLIENT_SECRET || !GOOGLE_DRIVE_REFRESH_TOKEN) {
-    throw new Error('Google Drive credentials not configured');
+    throw new Error('Google Drive credentials not configured. Cek Environment Variables Anda!');
   }
+  
   const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -27,11 +29,16 @@ async function getGoogleAccessToken(env) {
       grant_type: 'refresh_token',
     }),
   });
+  
   const tokenData = await tokenResponse.json();
-  if (!tokenResponse.ok) throw new Error('Failed to get Google Drive access token: ' + JSON.stringify(tokenData));
+  if (!tokenResponse.ok) {
+    console.error('Error mendapatkan access token:', tokenData);
+    throw new Error('Gagal mendapatkan access token Google Drive: ' + JSON.stringify(tokenData));
+  }
   return tokenData.access_token;
 }
 
+// Fungsi untuk membuat folder di Google Drive
 async function createFolder(accessToken, parentId, folderName) {
   const response = await fetch('https://www.googleapis.com/drive/v3/files', {
     method: 'POST',
@@ -43,23 +50,28 @@ async function createFolder(accessToken, parentId, folderName) {
   return data.id;
 }
 
+// Fungsi untuk mencari folder yang sudah ada, atau membuat baru
 async function getOrCreateFolder(accessToken, parentId, folderName) {
   const query = `name='${folderName}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`;
   const response = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   const data = await response.json();
+  
   if (data.files && data.files.length > 0) return data.files[0].id;
   return await createFolder(accessToken, parentId, folderName);
 }
 
+// Fungsi untuk upload file ke Google Drive
 async function uploadToGoogleDrive(env, folderPath, fileName, bytes, rootFolderId) {
   const accessToken = await getGoogleAccessToken(env);
   const pathSegments = folderPath.split('/').filter(Boolean);
   let currentFolderId = rootFolderId;
+  
   for (const folderName of pathSegments) {
     currentFolderId = await getOrCreateFolder(accessToken, currentFolderId, folderName);
   }
+
   const metadata = { name: fileName, parents: [currentFolderId] };
   const initResponse = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable', {
     method: 'POST',
@@ -71,21 +83,30 @@ async function uploadToGoogleDrive(env, folderPath, fileName, bytes, rootFolderI
     },
     body: JSON.stringify(metadata),
   });
-  if (!initResponse.ok) throw new Error('Gagal inisialisasi upload: ' + await initResponse.text());
+
+  if (!initResponse.ok) {
+    const errText = await initResponse.text();
+    throw new Error('Gagal inisialisasi upload: ' + errText);
+  }
+
   const location = initResponse.headers.get('Location');
   if (!location) throw new Error('Tidak ada URL upload dari Google Drive');
+
   const uploadResponse = await fetch(location, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/octet-stream', 'Content-Length': bytes.length.toString() },
     body: bytes,
   });
+
   const result = await uploadResponse.json();
-  if (!uploadResponse.ok) throw new Error('Gagal upload file ke Google Drive: ' + JSON.stringify(result));
+  if (!uploadResponse.ok) {
+    throw new Error('Gagal upload file ke Google Drive: ' + JSON.stringify(result));
+  }
   return result.id;
 }
 // ============ END GOOGLE DRIVE ============
 
-// ============ SEND EMAIL NOTIFICATION (Resend) ============
+// ============ SEND EMAIL NOTIFICATION ============
 async function sendEmailNotification(env, submission, documents) {
   if (!env.RESEND_API_KEY || !env.ADMIN_EMAIL) return;
   try {
@@ -137,7 +158,7 @@ export const onRequest = async ({ request, env }) => {
 
   try {
     switch (action) {
-      // ============ STEP 1: SUBMIT PENGAJUAN ============
+      // STEP 1: Submit Pengajuan
       case 'submitPengajuan': {
         const { nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail } = params;
         const nomor = 'SKBT-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 100);
@@ -148,19 +169,18 @@ export const onRequest = async ({ request, env }) => {
         ).bind(nomor, nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail).run();
 
         const subId = insert.meta.last_row_id;
-
         return jsonResponse({ status: 'success', msg: 'Data Pemohon tersimpan', id: subId, nomor_pengajuan: nomor });
       }
 
-      // ============ STEP 2: UPLOAD FILE (HANYA KE R2) ============
+      // STEP 2: Upload ke R2 (Staging)
       case 'uploadDocument': {
         const { submission_id, dokumen_code, nama_dokumen, file_name, file_data } = params;
         
         try {
           const decoded = atob(file_data);
           const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
-          if (bytes.length > 10 * 1024 * 1024) { // Maksimal 10MB
-            return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 10MB.' });
+          if (bytes.length > 5 * 1024 * 1024) {
+            return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 5MB.' });
           }
 
           const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
@@ -180,7 +200,7 @@ export const onRequest = async ({ request, env }) => {
         }
       }
 
-      // ============ STEP 3: FINALISASI (UPLOAD DRIVE + EMAIL + NOMOR) ============
+      // STEP 3: Finalisasi (Upload ke Google Drive + Email + Nomor)
       case 'finalizeSubmission': {
         const { submission_id, nama_pemohon } = params;
         
@@ -190,16 +210,13 @@ export const onRequest = async ({ request, env }) => {
         const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(submission_id).all();
         const documents = docs.results;
 
+        let successCount = 0;
+        let errorCount = 0;
+
         // Upload semua dokumen ke Google Drive satu per satu
-        let uploadSuccessCount = 0;
-        let uploadFailCount = 0;
         for (const doc of documents) {
-          // Log untuk debug
-          console.log('Memproses file:', doc.file_name, 'URL:', doc.file_url);
-          
           if (doc.file_url && doc.file_url.includes('r2.dev/')) {
             try {
-              // Ambil path R2 dari URL
               const r2Path = decodeURIComponent(doc.file_url.split('r2.dev/')[1]);
               const r2Object = await env.EVIDENCE_BUCKET.get(r2Path);
               
@@ -208,30 +225,31 @@ export const onRequest = async ({ request, env }) => {
                 const gdriveId = await uploadToGoogleDrive(env, `${nama_pemohon}/${doc.dokumen_code}`, doc.file_name, bytes, env.GOOGLE_DRIVE_FOLDER_ID);
               
                 await env.DB.prepare("UPDATE skbt_documents SET gdrive_id = ? WHERE id = ?").bind(gdriveId, doc.id).run();
-                uploadSuccessCount++;
-              } else {
-                console.error('File tidak ditemukan di R2:', r2Path);
-                uploadFailCount++;
+                successCount++;
               }
             } catch (e) {
+              errorCount++;
               console.error('Gagal upload ke Drive:', doc.file_name, e.message);
-              uploadFailCount++;
             }
           }
         }
 
-        console.log(`Upload ke Google Drive selesai: ${uploadSuccessCount} sukses, ${uploadFailCount} gagal`);
-
-        // Kirim Email
+        // Kirim Email Notifikasi
         await sendEmailNotification(env, sub, documents);
 
         // Update Status
         await env.DB.prepare(`UPDATE skbt_submissions SET status_verifikasi = 'Menunggu Irban' WHERE id = ?`).bind(submission_id).run();
 
-        return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dikirim', nomor_pengajuan: sub.nomor_pengajuan, successCount: uploadSuccessCount, failCount: uploadFailCount });
+        return jsonResponse({ 
+          status: 'success', 
+          msg: `Pengajuan berhasil dikirim. ${successCount} file berhasil diupload ke Drive, ${errorCount} file gagal.`, 
+          nomor_pengajuan: sub.nomor_pengajuan,
+          successCount: successCount,
+          errorCount: errorCount
+        });
       }
 
-      // ============ AMBIL DETAIL PENGAJUAN ============
+      // AMBIL DETAIL PENGAJUAN
       case 'getPengajuanById': {
         const { id } = params;
         const sub = await env.DB.prepare("SELECT * FROM skbt_submissions WHERE id = ?").bind(id).first();
@@ -239,7 +257,7 @@ export const onRequest = async ({ request, env }) => {
         return jsonResponse({ submission: sub, documents: docs.results });
       }
 
-      // ============ DASHBOARD ============
+      // DASHBOARD
       case 'getAllPengajuan': {
         const { results } = await env.DB.prepare("SELECT * FROM skbt_submissions ORDER BY created_at DESC").all();
         return jsonResponse(results);
