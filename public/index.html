@@ -73,12 +73,10 @@
     .modal-text { font-size: 1.1rem; color: #fff; margin-bottom: 25px; font-weight: 500; }
     .modal-actions { display: flex; justify-content: center; gap: 10px; }
 
-    /* CAPTCHA */
+    /* CAPTCHA & PROGRESS */
     .captcha-box { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-top: 20px; }
     .captcha-question { font-size: 1.2rem; font-weight: 700; color: #ffd166; }
     .captcha-input { width: 80px; text-align: center; }
-    
-    /* PROGRESS OVERLAY */
     .progress-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 4, 94, 0.85); z-index: 9998; display: flex; justify-content: center; align-items: center; flex-direction: column; opacity: 0; visibility: hidden; transition: all 0.3s; }
     .progress-overlay.active { opacity: 1; visibility: visible; }
     .progress-container { width: 80%; max-width: 500px; background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 30px; text-align: center; border: 2px solid var(--green); }
@@ -293,6 +291,10 @@
     document.getElementById('captchaInput').value = '';
   }
 
+  // ===== LOGIKA VALIDASI UPLOAD =====
+  // Set untuk melacak dokumen yang sudah berhasil diupload
+  let uploadedDocs = new Set();
+
   async function callServer(action, params = {}) {
     const res = await fetch('/skbtHandler?action=' + action, {
       method: 'POST',
@@ -330,7 +332,9 @@
       return;
     }
 
-    // STEP 1: Simpan data pemohon (TANPA EMAIL)
+    // Reset status upload saat pindah halaman
+    uploadedDocs = new Set();
+
     const res = await callServer('submitPengajuan', {
       nama_pemohon: nama, nip: nip, jabatan: jabatan, unit_kerja: unit, nomor_hp: nomor_hp, gmail: gmail
     });
@@ -344,7 +348,7 @@
       document.getElementById('step2').classList.add('active');
       renderDokumen();
       generateCaptcha(); // Generate captcha saat masuk halaman 2
-      showCustomAlert('Data tersimpan! Silakan upload dokumen.', 'success');
+      showCustomAlert('Data tersimpan! Silakan upload semua dokumen yang dicentang.', 'success');
     } else {
       showCustomAlert('Gagal: ' + res.msg, 'error');
     }
@@ -391,6 +395,8 @@
       renderFileHistory(code);
     } else {
       uploadDiv.classList.add('hidden');
+      // Jika di-uncheck, hapus dari set uploadedDocs
+      uploadedDocs.delete(code);
     }
   }
 
@@ -445,8 +451,10 @@
       });
       if (res.status === 'success') {
         bar.style.width = '100%';
-        status.innerText = 'Tersimpan (Menunggu Finalisasi)'; // Ubah status agar tidak menyesatkan
+        status.innerText = 'Tersimpan (Menunggu Finalisasi)';
         status.classList.add('staged');
+        // Tandai dokumen ini sudah diupload
+        uploadedDocs.add(code);
         setTimeout(() => progressDiv.classList.add('hidden'), 2000);
         renderFileHistory(code);
       } else {
@@ -460,11 +468,33 @@
 
   // ===== SUBMIT AKHIR DENGAN PROGRESS BAR & CAPTCHA =====
   async function submitAkhir() {
-    // Validasi CAPTCHA
+    // 1. Validasi CAPTCHA
     const captchaInput = document.getElementById('captchaInput').value;
     if (parseInt(captchaInput) !== captchaResult) {
       showCustomAlert('Captcha salah! Silakan coba lagi.', 'error');
       generateCaptcha();
+      return;
+    }
+
+    // 2. Validasi semua dokumen wajib diupload
+    const checkedCodes = [];
+    dokumenList.forEach(d => {
+      if (document.getElementById('chk_' + d.code).checked) {
+        checkedCodes.push(d.code);
+      }
+    });
+
+    const allUploaded = checkedCodes.every(code => uploadedDocs.has(code));
+
+    if (!allUploaded) {
+      // Cari dokumen yang belum diupload
+      const missingDocs = checkedCodes.filter(code => !uploadedDocs.has(code));
+      const missingNames = missingDocs.map(code => {
+        const doc = dokumenList.find(d => d.code === code);
+        return doc ? doc.nama : code;
+      }).join(', ');
+
+      showCustomAlert('Semua dokumen yang dicentang WAJIB diupload!\nDokumen yang belum diupload: ' + missingNames, 'error');
       return;
     }
 
@@ -507,6 +537,7 @@
     ['nama', 'nip', 'jabatan', 'unit', 'nomor_hp', 'gmail'].forEach(id => document.getElementById(id).value = '');
     currentSubmissionId = null;
     namaPemohon = "";
+    uploadedDocs = new Set();
   }
 
   function kembaliKeHalaman1() {
