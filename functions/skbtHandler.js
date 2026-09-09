@@ -87,6 +87,54 @@ async function uploadToGoogleDrive(env, filePath, fileName, bytes, rootFolderId)
 }
 // ============ END GOOGLE DRIVE ============
 
+// ============ SEND EMAIL NOTIFICATION (Resend) ============
+async function sendEmailNotification(env, submission, documents) {
+  // Jika tidak ada API key Resend, lewati pengiriman email
+  if (!env.RESEND_API_KEY || !env.ADMIN_EMAIL) {
+    console.log('Email tidak dikirim karena RESEND_API_KEY atau ADMIN_EMAIL belum diatur.');
+    return;
+  }
+
+  try {
+    const docList = documents.map(d => `<li>${d.nama_dokumen}</li>`).join('');
+    const emailBody = `
+      <div style="font-family: Arial, sans-serif; background: #f4f7fb; padding: 20px;">
+        <h2 style="color: #03045e;">Pengajuan SKBT Baru</h2>
+        <p>Sebuah pengajuan baru telah dibuat.</p>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 8px; font-weight: bold; width: 150px;">Nomor</td><td>: ${submission.nomor_pengajuan}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">Nama</td><td>: ${submission.nama_pemohon}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">NIP</td><td>: ${submission.nip || '-'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">Jabatan</td><td>: ${submission.jabatan || '-'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">Unit Kerja</td><td>: ${submission.unit_kerja}</td></tr>
+        </table>
+        <h3 style="color: #0077b6;">Dokumen yang Diupload:</h3>
+        <ul>${docList}</ul>
+      </div>
+    `;
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'SKBT Mahakam Ulu <onboarding@resend.dev>', // Ganti dengan domain Anda jika sudah verifikasi
+        to: env.ADMIN_EMAIL,
+        subject: 'Pengajuan SKBT Baru: ' + submission.nomor_pengajuan,
+        html: emailBody
+      })
+    });
+
+    const data = await res.json();
+    console.log('Email Status:', res.status, data);
+  } catch (e) {
+    console.error('Gagal kirim email:', e);
+  }
+}
+// ============ END EMAIL ============
+
 // ACTION HANDLER
 export const onRequest = async ({ request, env }) => {
   const url = new URL(request.url);
@@ -142,6 +190,11 @@ export const onRequest = async ({ request, env }) => {
 
         const subId = insert.meta.last_row_id;
 
+        // Kirim notifikasi email ke Admin
+        const sub = await env.DB.prepare("SELECT * FROM skbt_submissions WHERE id = ?").bind(subId).first();
+        const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(subId).all();
+        await sendEmailNotification(env, sub, docs.results);
+
         return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dibuat', nomor_pengajuan: nomor, id: subId });
       }
 
@@ -174,7 +227,7 @@ export const onRequest = async ({ request, env }) => {
         return jsonResponse({ status: 'success', url: publicUrl, gdrive_id: gdriveId });
       }
 
-      // ============ AMBIL DETAIL PENGAJUAN ============
+      // ============ AMBIL DETAIL PENGAJUAN (TERMASUK RIWAYAT UPLOAD) ============
       case 'getPengajuanById': {
         const { id } = params;
         const sub = await env.DB.prepare("SELECT * FROM skbt_submissions WHERE id = ?").bind(id).first();
