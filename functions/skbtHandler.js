@@ -85,7 +85,7 @@ async function uploadToGoogleDrive(env, folderPath, fileName, bytes, rootFolderI
 }
 // ============ END GOOGLE DRIVE ============
 
-// ============ SEND EMAIL NOTIFICATION (Resend) - HANYA DIPANGGIL SAAT FINAL ============
+// ============ SEND EMAIL NOTIFICATION (Resend) ============
 async function sendEmailNotification(env, submission, documents) {
   if (!env.RESEND_API_KEY || !env.ADMIN_EMAIL) return;
   try {
@@ -149,49 +149,54 @@ export const onRequest = async ({ request, env }) => {
 
         const subId = insert.meta.last_row_id;
 
-        // Hanya kirim balik ID dan Nomor, TANPA Email
         return jsonResponse({ status: 'success', msg: 'Data Pemohon tersimpan', id: subId, nomor_pengajuan: nomor });
       }
 
-      // ============ STEP 2: UPLOAD FILE (HANYA KE R2, TANPA DRIVE, TANPA EMAIL) ============
+      // ============ STEP 2: UPLOAD FILE (HANYA KE R2) ============
       case 'uploadDocument': {
         const { submission_id, dokumen_code, nama_dokumen, file_name, file_data } = params;
         
-        // Batasi ukuran file maksimal 10MB (untuk mencegah crash 503)
-        const decoded = atob(file_data);
-        const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
-        if (bytes.length > 10 * 1024 * 1024) {
-          return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 10MB.' });
+        try {
+          // **PENTING: Batas ukuran file 5MB** (Base64 membuat file jadi ~33% lebih besar)
+          const decoded = atob(file_data);
+          const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
+          if (bytes.length > 5 * 1024 * 1024) {
+            return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 5MB.' });
+          }
+
+          const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
+          
+          // Ganti URL R2 dengan URL yang benar dan SUDAH PUBLIK!
+          // Pastikan R2 bucket Anda sudah diaktifkan "Public Access"
+          const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`;
+
+          // Simpan ke R2
+          await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
+
+          // Simpan metadata ke D1
+          await env.DB.prepare(
+            `INSERT INTO skbt_documents (submission_id, dokumen_code, nama_dokumen, file_name, file_url, gdrive_id)
+             VALUES (?, ?, ?, ?, ?, NULL)`
+          ).bind(submission_id, dokumen_code, nama_dokumen, file_name, publicUrl).run();
+
+          return jsonResponse({ status: 'success', url: publicUrl, msg: 'File tersimpan di server' });
+        } catch (e) {
+          console.error('Error uploadDocument:', e.message);
+          return jsonResponse({ status: 'error', msg: 'Terjadi kesalahan saat menyimpan file: ' + e.message });
         }
-
-        const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
-
-        // Simpan ke R2 dulu (Staging) - Ganti URL di bawah dengan URL R2 yang benar
-        await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
-        const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`; // URL R2 Baru!
-
-        // Simpan metadata ke D1 (gdrive_id NULL, TANPA upload ke Drive)
-        await env.DB.prepare(
-          `INSERT INTO skbt_documents (submission_id, dokumen_code, nama_dokumen, file_name, file_url, gdrive_id)
-           VALUES (?, ?, ?, ?, ?, NULL)`
-        ).bind(submission_id, dokumen_code, nama_dokumen, file_name, publicUrl).run();
-
-        return jsonResponse({ status: 'success', url: publicUrl, msg: 'File tersimpan di server, menunggu finalisasi' });
       }
 
       // ============ STEP 3: FINALISASI (UPLOAD DRIVE + EMAIL + NOMOR) ============
       case 'finalizeSubmission': {
         const { submission_id, nama_pemohon } = params;
         
-        // Ambil detail pengajuan
         const sub = await env.DB.prepare("SELECT * FROM skbt_submissions WHERE id = ?").bind(submission_id).first();
         if (!sub) return jsonResponse({ status: 'error', msg: 'Pengajuan tidak ditemukan' });
 
-        // Ambil semua dokumen
         const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(submission_id).all();
         const documents = docs.results;
 
-        // 1. Upload semua dokumen ke Google Drive (Sekarang!)
+        // Upload semua dokumen ke Google Drive satu per satu (untuk mencegah timeout)
         for (const doc of documents) {
           if (doc.file_url && doc.file_url.includes('r2.dev/')) {
             try {
@@ -202,7 +207,6 @@ export const onRequest = async ({ request, env }) => {
                 const bytes = await r2Object.arrayBuffer();
                 const gdriveId = await uploadToGoogleDrive(env, `${nama_pemohon}/${doc.dokumen_code}`, doc.file_name, bytes, env.GOOGLE_DRIVE_FOLDER_ID);
               
-                // Update DB dengan gdrive_id
                 await env.DB.prepare("UPDATE skbt_documents SET gdrive_id = ? WHERE id = ?").bind(gdriveId, doc.id).run();
               }
             } catch (e) {
@@ -211,13 +215,12 @@ export const onRequest = async ({ request, env }) => {
           }
         }
 
-        // 2. Kirim Email Notifikasi
+        // Kirim Email
         await sendEmailNotification(env, sub, documents);
 
-        // 3. Update Status Pengajuan menjadi "Menunggu Irban"
+        // Update Status
         await env.DB.prepare(`UPDATE skbt_submissions SET status_verifikasi = 'Menunggu Irban' WHERE id = ?`).bind(submission_id).run();
 
-        // 4. Kembalikan Nomor Pengajuan (Akhirnya!)
         return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dikirim', nomor_pengajuan: sub.nomor_pengajuan });
       }
 
