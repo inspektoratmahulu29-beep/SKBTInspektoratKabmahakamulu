@@ -65,18 +65,17 @@ async function uploadFileToGoogleDrive(env, folderPath, fileName, bytes, rootFol
     console.log('Folder ditemukan/dibuat:', folderName, 'dengan ID:', currentFolderId);
   }
 
-  // 2. Upload file ke folder tersebut (Simple Upload - lebih stabil)
+  // 2. Upload file ke folder tersebut
   const metadata = { name: fileName, parents: [currentFolderId] };
-  
-  // Gunakan Simple Upload (uploadType=media) untuk menghindari masalah content-length
-  const uploadUrl = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=media';
-  const initResponse = await fetch(uploadUrl, {
+  const initResponse = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/octet-stream',
+      'Content-Type': 'application/json; charset=UTF-8',
+      'X-Upload-Content-Type': 'application/octet-stream',
+      'X-Upload-Content-Length': bytes.length.toString(),
     },
-    body: bytes,
+    body: JSON.stringify(metadata),
   });
 
   if (!initResponse.ok) {
@@ -84,8 +83,17 @@ async function uploadFileToGoogleDrive(env, folderPath, fileName, bytes, rootFol
     throw new Error('Gagal inisialisasi upload: ' + errText);
   }
 
-  const result = await initResponse.json();
-  if (!result.id) {
+  const location = initResponse.headers.get('Location');
+  if (!location) throw new Error('Tidak ada URL upload dari Google Drive');
+
+  const uploadResponse = await fetch(location, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/octet-stream', 'Content-Length': bytes.length.toString() },
+    body: bytes,
+  });
+
+  const result = await uploadResponse.json();
+  if (!uploadResponse.ok) {
     throw new Error('Gagal upload file ke Google Drive: ' + JSON.stringify(result));
   }
   console.log('File berhasil diupload ke Google Drive dengan ID:', result.id);
@@ -172,6 +180,7 @@ export const onRequest = async ({ request, env }) => {
             return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 10MB.' });
           }
 
+          // **PENTING: Simpan path R2 yang benar, bukan URL publik**
           const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
           const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`;
 
@@ -203,13 +212,12 @@ export const onRequest = async ({ request, env }) => {
         for (const doc of documents) {
           if (doc.file_url && doc.file_url.includes('r2.dev/')) {
             try {
-              // **PERBAIKAN PENTING: Ambil path R2 dengan benar**
+              // **AMBIL PATH R2 DENGAN BENAR DARI URL**
               const marker = 'r2.dev/';
               const idx = doc.file_url.indexOf(marker);
-              if (idx === -1) continue; // Lewati jika format URL tidak sesuai
+              if (idx === -1) continue;
               
               const r2Path = decodeURIComponent(doc.file_url.substring(idx + marker.length));
-              console.log('Mengambil file dari R2:', r2Path);
               
               const r2Object = await env.EVIDENCE_BUCKET.get(r2Path);
               if (!r2Object) {
@@ -218,13 +226,9 @@ export const onRequest = async ({ request, env }) => {
               }
               
               const bytes = await r2Object.arrayBuffer();
-              console.log('File ditemukan di R2, ukuran:', bytes.byteLength);
-              
-              // **Upload ke Google Drive**
               const folderPath = `${nama_pemohon}/${doc.dokumen_code}`;
-              const gdriveId = await uploadFileToGoogleDrive(env, folderPath, doc.file_name, bytes, env.GOOGLE_DRIVE_FOLDER_ID);
+              const gdriveId = await uploadFileToGoogleDrive(env, folderPath, doc.file_name, new Uint8Array(bytes), env.GOOGLE_DRIVE_FOLDER_ID);
               
-              // **Update database dengan gdrive_id**
               await env.DB.prepare("UPDATE skbt_documents SET gdrive_id = ? WHERE id = ?").bind(gdriveId, doc.id).run();
               console.log('File berhasil diupload ke Drive, ID:', gdriveId);
             } catch (e) {
