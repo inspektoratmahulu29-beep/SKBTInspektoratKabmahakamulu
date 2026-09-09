@@ -165,7 +165,6 @@ export const onRequest = async ({ request, env }) => {
             return jsonResponse({ status: 'error', msg: 'File terlalu besar! Maksimal 5MB.' });
           }
 
-          // Buat path R2 dengan nama pemohon di depan filename agar rapi
           const safeNama = (nama_pemohon || 'Pemohon').replace(/[^a-zA-Z0-9]/g, '_');
           const r2Path = `skbt/${submission_id}/${dokumen_code}/${safeNama}_${Date.now()}_${file_name}`;
           const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`;
@@ -184,22 +183,18 @@ export const onRequest = async ({ request, env }) => {
         }
       }
 
-      // ============ STEP 3: FINALISASI (Upload ke Drive + Email + Nomor) ============
+      // ============ STEP 3: FINALISASI (UPLOAD DRIVE + EMAIL + NOMOR) ============
       case 'finalizeSubmission': {
         const { submission_id, nama_pemohon } = params;
         
         const sub = await env.DB.prepare("SELECT * FROM skbt_submissions WHERE id = ?").bind(submission_id).first();
         if (!sub) return jsonResponse({ status: 'error', msg: 'Pengajuan tidak ditemukan' });
 
-        // Ambil SEMUA dokumen
         const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(submission_id).all();
         const documents = docs.results;
 
-        // 1. Upload SEMUA dokumen yang belum punya gdrive_id ke Google Drive
+        // Upload semua dokumen ke Google Drive
         for (const doc of documents) {
-          // **PERBAIKAN PENTING: LEWATI jika sudah punya gdrive_id (sudah terupload sebelumnya)**
-          if (doc.gdrive_id) continue;
-
           if (doc.file_url && doc.file_url.includes('r2.dev/')) {
             try {
               const marker = 'r2.dev/';
@@ -217,19 +212,17 @@ export const onRequest = async ({ request, env }) => {
               const folderPath = `${nama_pemohon}/${doc.dokumen_code}`;
               const gdriveId = await uploadFileToGoogleDrive(env, folderPath, doc.file_name, new Uint8Array(bytes), env.GOOGLE_DRIVE_FOLDER_ID);
               
-              // Update database dengan gdrive_id
               await env.DB.prepare("UPDATE skbt_documents SET gdrive_id = ? WHERE id = ?").bind(gdriveId, doc.id).run();
             } catch (e) {
               console.error('Gagal upload ke Drive:', doc.file_name, e.message);
-              // Jangan hentikan proses, lanjut ke file berikutnya
             }
           }
         }
 
-        // 2. Kirim Email
+        // Kirim Email
         await sendEmailNotification(env, sub, documents);
 
-        // 3. Update Status
+        // Update Status
         await env.DB.prepare(`UPDATE skbt_submissions SET status_verifikasi = 'Menunggu Irban' WHERE id = ?`).bind(submission_id).run();
 
         return jsonResponse({ status: 'success', msg: 'Pengajuan berhasil dikirim', nomor_pengajuan: sub.nomor_pengajuan });
