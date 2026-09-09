@@ -317,6 +317,33 @@
       transition: width 0.3s ease;
     }
 
+    /* ====== RIWAYAT UPLOAD ====== */
+    .file-history {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    .file-item a {
+      color: #90e0ef;
+      text-decoration: none;
+    }
+
+    .file-item a:hover {
+      color: #06d6a0;
+    }
+
     /* ====== BUTTON ====== */
     .btn-gradient {
       background: linear-gradient(135deg, #00b4d8, #06d6a0);
@@ -554,6 +581,7 @@
               </div>
               <small id="status_${doc.code}" class="upload-status"></small>
             </div>
+            <div id="filehistory_${doc.code}" class="file-history"></div>
           </div>
         </div>
       </div>
@@ -565,8 +593,29 @@
     const uploadDiv = document.getElementById('upload_' + code);
     if (checked) {
       uploadDiv.classList.remove('hidden');
+      renderFileHistory(code);
     } else {
       uploadDiv.classList.add('hidden');
+    }
+  }
+
+  // ===== Fitur Riwayat Upload =====
+  async function renderFileHistory(code) {
+    if (!currentSubmissionId) return;
+    const res = await callServer('getPengajuanById', { id: currentSubmissionId });
+    if (res.status === 'success') {
+      const docs = res.documents.filter(d => d.dokumen_code === code);
+      const historyDiv = document.getElementById('filehistory_' + code);
+      historyDiv.innerHTML = '';
+      docs.forEach(doc => {
+        historyDiv.innerHTML += `
+          <div class="file-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;">
+              <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+            </svg>
+            <a href="${doc.file_url}" target="_blank">${doc.file_name}</a>
+          </div>`;
+      });
     }
   }
 
@@ -609,6 +658,7 @@
         setTimeout(() => {
           progressDiv.classList.add('hidden');
         }, 2000);
+        renderFileHistory(code);
       } else {
         bar.style.width = '0%';
         status.innerText = 'Gagal: ' + res.msg;
@@ -643,7 +693,7 @@
 
     if (res.status === 'success') {
       currentSubmissionId = res.id;
-      alert('Pengajuan dibuat! Nomor: ' + res.nomor_pengajuan + '. Silakan upload dokumen pada ceklis di atas.');
+      alert('Pengajuan dibuat! Nomor: ' + res.nomor_pengajuan + '. Silakan upload dokumen pada ceklis di atas. Notifikasi email telah dikirim ke Admin.');
     } else {
       alert('Gagal: ' + res.msg);
     }
