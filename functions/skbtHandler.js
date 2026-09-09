@@ -57,7 +57,6 @@ async function uploadToGoogleDrive(env, folderPath, fileName, bytes, rootFolderI
   const accessToken = await getGoogleAccessToken(env);
   const pathSegments = folderPath.split('/').filter(Boolean);
 
-  // Mulai dari root folder ID
   let currentFolderId = rootFolderId;
   for (const folderName of pathSegments) {
     currentFolderId = await getOrCreateFolder(accessToken, currentFolderId, folderName);
@@ -102,6 +101,8 @@ async function sendEmailNotification(env, submission, documents) {
           <tr><td style="padding: 8px; font-weight: bold;">NIP</td><td>: ${submission.nip || '-'}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Jabatan</td><td>: ${submission.jabatan || '-'}</td></tr>
           <tr><td style="padding: 8px; font-weight: bold;">Unit Kerja</td><td>: ${submission.unit_kerja}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">Nomor HP</td><td>: ${submission.nomor_hp || '-'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">Gmail</td><td>: ${submission.gmail || '-'}</td></tr>
         </table>
         <h3 style="color: #0077b6;">Dokumen yang Diupload:</h3>
         <ul>${docList}</ul>
@@ -110,7 +111,12 @@ async function sendEmailNotification(env, submission, documents) {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'onboarding@resend.dev', to: env.ADMIN_EMAIL, subject: 'Pengajuan SKBT Baru: ' + submission.nomor_pengajuan, html: emailBody })
+      body: JSON.stringify({
+        from: 'Pengajuan SKBT <onboarding@resend.dev>', // Ubah nama pengirim di sini
+        to: env.ADMIN_EMAIL,
+        subject: 'Pengajuan SKBT Baru: ' + submission.nomor_pengajuan,
+        html: emailBody
+      })
     });
     console.log('Email Status:', res.status, await res.json());
   } catch (e) { console.error('Gagal kirim email:', e); }
@@ -140,7 +146,8 @@ export const onRequest = async ({ request, env }) => {
     switch (action) {
       case 'getDokumenList': {
         return jsonResponse([
-          { code: 'SKCPNS', nama: 'SK CPNS & PNS' },
+          { code: 'SKCPNS', nama: 'SK CPNS' },
+          { code: 'SKPNS', nama: 'SK PNS' },
           { code: 'SKPangkat', nama: 'SK Pangkat Terakhir' },
           { code: 'SKJabatan', nama: 'SK Jabatan Terakhir' },
           { code: 'SKP', nama: 'SKP 1 atau 2 Tahun Terakhir' },
@@ -163,7 +170,6 @@ export const onRequest = async ({ request, env }) => {
 
         const subId = insert.meta.last_row_id;
 
-        // Kirim email (opsional)
         const sub = await env.DB.prepare("SELECT * FROM skbt_submissions WHERE id = ?").bind(subId).first();
         const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(subId).all();
         await sendEmailNotification(env, sub, docs.results);
@@ -177,11 +183,9 @@ export const onRequest = async ({ request, env }) => {
         const bytes = Uint8Array.from(atob(file_data), c => c.charCodeAt(0));
         const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
 
-        // Simpan ke R2
         await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
         const publicUrl = `https://pub-8e4e0075c2e4428e95f6455b2e2b9826.r2.dev/${r2Path}`; // Ganti dengan URL R2 Anda
 
-        // Simpan ke Google Drive (Folder: Nama Pemohon / Jenis Dokumen)
         let gdriveId = null;
         if (env.GOOGLE_DRIVE_CLIENT_ID && env.GOOGLE_DRIVE_CLIENT_SECRET && env.GOOGLE_DRIVE_REFRESH_TOKEN && env.GOOGLE_DRIVE_FOLDER_ID) {
           try {
@@ -190,7 +194,6 @@ export const onRequest = async ({ request, env }) => {
           } catch (e) { console.error('GDrive upload failed:', e); }
         }
 
-        // Simpan metadata ke D1
         await env.DB.prepare(
           `INSERT INTO skbt_documents (submission_id, dokumen_code, nama_dokumen, file_name, file_url, gdrive_id)
            VALUES (?, ?, ?, ?, ?, ?)`
