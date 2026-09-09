@@ -137,7 +137,7 @@ export const onRequest = async ({ request, env }) => {
 
   try {
     switch (action) {
-      // ============ STEP 1: SUBMIT PENGAJUAN (TANPA EMAIL, TANPA DRIVE) ============
+      // ============ STEP 1: SUBMIT PENGAJUAN ============
       case 'submitPengajuan': {
         const { nama_pemohon, nip, jabatan, unit_kerja, nomor_hp, gmail } = params;
         const nomor = 'SKBT-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 100);
@@ -157,7 +157,6 @@ export const onRequest = async ({ request, env }) => {
         const { submission_id, dokumen_code, nama_dokumen, file_name, file_data } = params;
         
         try {
-          // **PENTING: Batas ukuran file 5MB** (Base64 membuat file jadi ~33% lebih besar)
           const decoded = atob(file_data);
           const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
           if (bytes.length > 5 * 1024 * 1024) {
@@ -165,15 +164,10 @@ export const onRequest = async ({ request, env }) => {
           }
 
           const r2Path = `skbt/${submission_id}/${dokumen_code}/${Date.now()}_${file_name}`;
-          
-          // Ganti URL R2 dengan URL yang benar dan SUDAH PUBLIK!
-          // Pastikan R2 bucket Anda sudah diaktifkan "Public Access"
           const publicUrl = `https://pub-68de0ab1691946469b18177ed5ce1404.r2.dev/${r2Path}`;
 
-          // Simpan ke R2
           await env.EVIDENCE_BUCKET.put(r2Path, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
 
-          // Simpan metadata ke D1
           await env.DB.prepare(
             `INSERT INTO skbt_documents (submission_id, dokumen_code, nama_dokumen, file_name, file_url, gdrive_id)
              VALUES (?, ?, ?, ?, ?, NULL)`
@@ -196,7 +190,7 @@ export const onRequest = async ({ request, env }) => {
         const docs = await env.DB.prepare("SELECT * FROM skbt_documents WHERE submission_id = ?").bind(submission_id).all();
         const documents = docs.results;
 
-        // Upload semua dokumen ke Google Drive satu per satu (untuk mencegah timeout)
+        // Upload semua dokumen ke Google Drive satu per satu
         for (const doc of documents) {
           if (doc.file_url && doc.file_url.includes('r2.dev/')) {
             try {
