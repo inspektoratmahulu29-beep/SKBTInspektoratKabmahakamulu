@@ -71,10 +71,10 @@
     .modal-icon.info { background: rgba(0,180,216,0.2); color: var(--primary-light); border: 1px solid var(--primary-light); }
     .modal-text { font-size: 1.1rem; color: #fff; margin-bottom: 25px; font-weight: 500; }
     .modal-actions { display: flex; justify-content: center; gap: 10px; }
-    /* CAPTCHA & PROGRESS */
+    /* CAPTCHA TEKS (BARU) */
     .captcha-box { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-top: 20px; }
-    .captcha-question { font-size: 1.2rem; font-weight: 700; color: #ffd166; }
-    .captcha-input { width: 80px; text-align: center; }
+    .captcha-question { font-size: 1.2rem; font-weight: 800; color: #ffd166; letter-spacing: 2px; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 8px; }
+    .captcha-input { width: 120px; text-align: center; }
     .progress-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 4, 94, 0.85); z-index: 9998; display: flex; justify-content: center; align-items: center; flex-direction: column; opacity: 0; visibility: hidden; transition: all 0.3s; }
     .progress-overlay.active { opacity: 1; visibility: visible; }
     .progress-container { width: 80%; max-width: 500px; background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 30px; text-align: center; border: 2px solid var(--green); }
@@ -202,10 +202,10 @@
       </div>
       <div id="daftarDokumen" class="row g-3"></div>
       
-      <!-- CAPTCHA -->
+      <!-- CAPTCHA TEKS -->
       <div class="captcha-box">
-        <span class="captcha-question" id="captchaQuestion">3 + 4 = ?</span>
-        <input type="number" id="captchaInput" class="form-control captcha-input" placeholder="?">
+        <span class="captcha-question" id="captchaQuestion">KATA</span>
+        <input type="text" id="captchaInput" class="form-control captcha-input" placeholder="Ketik di sini">
         <button class="btn-outline-light-custom btn-sm" onclick="generateCaptcha()">🔄</button>
       </div>
 
@@ -292,13 +292,12 @@
     document.getElementById('progressOverlay').classList.remove('active');
   }
 
-  // ===== CAPTCHA =====
-  let captchaResult = 0;
+  // ===== CAPTCHA TEKS (BARU) =====
+  let captchaResult = "";
+  const captchaWords = ['KUCING', 'MEJA', 'BUKU', 'SUNGAI', 'BINTANG', 'POHON', 'RUMAH'];
   function generateCaptcha() {
-    const num1 = Math.floor(Math.random() * 9) + 1;
-    const num2 = Math.floor(Math.random() * 9) + 1;
-    captchaResult = num1 + num2;
-    document.getElementById('captchaQuestion').innerText = num1 + ' + ' + num2 + ' = ?';
+    captchaResult = captchaWords[Math.floor(Math.random() * captchaWords.length)];
+    document.getElementById('captchaQuestion').innerText = captchaResult;
     document.getElementById('captchaInput').value = '';
   }
 
@@ -315,7 +314,7 @@
     return await res.json();
   }
 
-  // Daftar dokumen: SK CPNS/PNS digabung, boleh 2 file, lainnya 1 file
+  // Daftar dokumen: Gabung SK Bebas Masalah & Piutang (maks 2 file), lainnya 1 file
   const dokumenList = [
     { code: 'SKCPNS_PNS', nama: 'SK CPNS / PNS', maxFiles: 2 },
     { code: 'SKPangkat', nama: 'SK Pangkat Terakhir', maxFiles: 1 },
@@ -323,8 +322,7 @@
     { code: 'SKP', nama: 'SKP 1 atau 2 Tahun Terakhir', maxFiles: 1 },
     { code: 'SuratPermohonan', nama: 'Surat Permohonan', maxFiles: 1 },
     { code: 'SuratPengantar', nama: 'Surat Pengantar dari Pimpinan OPD', maxFiles: 1 },
-    { code: 'SKBebasMasalah', nama: 'SK Bebas Masalah', maxFiles: 1 },
-    { code: 'SKBendahara', nama: 'SK Status Bebas Hutang/Piutang', maxFiles: 1 }
+    { code: 'SKBebas', nama: 'SK Bebas Masalah & Bebas Hutang/Piutang', maxFiles: 2 }
   ];
 
   let currentSubmissionId = null;
@@ -435,18 +433,15 @@
     if (!input.files.length) return;
     const file = input.files[0];
 
-    // Ambil maxFiles dari dokumen ini
     const docInfo = dokumenList.find(d => d.code === code);
     const maxFiles = docInfo ? docInfo.maxFiles : 1;
 
-    // Cek jumlah file sudah maksimal
     const currentCount = uploadedDocCount[code] || 0;
     if (currentCount >= maxFiles) {
       showCustomAlert('Maksimal ' + maxFiles + ' file untuk ' + docInfo.nama, 'error');
       return;
     }
 
-    // Batasi ukuran file 5MB
     if (file.size > 5 * 1024 * 1024) {
       showCustomAlert('File ' + file.name + ' melebihi 5MB! Silakan kompres atau pilih file lain.', 'error');
       return;
@@ -477,7 +472,7 @@
           nama_dokumen: docInfo.nama,
           file_name: file.name,
           file_data: base64,
-          nama_pemohon: namaPemohon // Kirim nama untuk penamaan R2
+          nama_pemohon: namaPemohon
         });
         if (res.status === 'success') {
           bar.style.width = '100%';
@@ -503,13 +498,15 @@
   }
 
   async function submitAkhir() {
-    const captchaInput = document.getElementById('captchaInput').value;
-    if (parseInt(captchaInput) !== captchaResult) {
+    // 1. Validasi CAPTCHA TEKS
+    const captchaInput = document.getElementById('captchaInput').value.toUpperCase().trim();
+    if (captchaInput !== captchaResult) {
       showCustomAlert('Captcha salah! Silakan coba lagi.', 'error');
       generateCaptcha();
       return;
     }
 
+    // 2. Validasi semua dokumen wajib diupload
     const checkedCodes = [];
     dokumenList.forEach(d => {
       if (document.getElementById('chk_' + d.code).checked) {
@@ -517,7 +514,6 @@
       }
     });
 
-    // Validasi semua dokumen yang dicentang sudah diupload minimal 1 file
     const allUploaded = checkedCodes.every(code => uploadedDocs.has(code) && uploadedDocCount[code] > 0);
 
     if (!allUploaded) {
