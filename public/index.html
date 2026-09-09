@@ -3,651 +3,401 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SKBT - Inspektorat Mahakam Ulu</title>
-  
-  <!-- ===== FAVICON ===== -->
-  <!-- HANYA MENGGUNAKAN favicon.png KARENA ITU SATU-SATUNYA FILE YANG ADA -->
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="apple-touch-icon" href="/favicon.png">
-  
-  <!-- ===== META ===== -->
-  <meta name="description" content="Aplikasi Pengajuan SKBT - Inspektorat Daerah Kabupaten Mahakam Ulu">
-  <meta name="theme-color" content="#0077b6">
-  
+  <title>Admin Verifikasi SKBT</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-    :root { --primary: #0077b6; --primary-light: #00b4d8; --secondary: #90e0ef; --dark: #03045e; --green: #06d6a0; --green-dark: #118ab2; --white: #ffffff; --surface: rgba(255, 255, 255, 0.05); --surface-hover: rgba(255, 255, 255, 0.1); --border: rgba(255, 255, 255, 0.15); --text: #f8f9fa; --text-muted: #adb5bd; }
-    body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #03045e, #0077b6, #00b4d8, #06d6a0); background-size: 400% 400%; animation: gradientBG 12s ease infinite; color: var(--text); min-height: 100vh; padding: 30px; }
-    @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: rgba(0, 0, 0, 0.2); border-radius: 20px; padding: 15px 25px; border: 1px solid rgba(255, 255, 255, 0.1); }
-    .logo-wrapper { display: flex; align-items: center; gap: 20px; }
-    .logo-wrapper img { width: 80px; height: 80px; object-fit: contain; }
-    .header-title { text-align: center; flex: 1; }
-    .header-title h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #ffffff, #90e0ef, #06d6a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
-    .header-title p { color: var(--text-muted); font-size: 0.95rem; margin: 5px 0 0; }
-    .hero { background: rgba(3, 4, 94, 0.55); backdrop-filter: blur(20px); border-radius: 32px; padding: 40px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5); margin-top: 20px; overflow: hidden; position: relative; }
-    .hero::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, rgba(0, 180, 216, 0.2), transparent, rgba(6, 214, 160, 0.2), transparent); animation: rotateBorder 15s linear infinite; z-index: -1; }
-    @keyframes rotateBorder { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .step-indicator { display: flex; justify-content: space-between; margin-bottom: 40px; background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 50px; border: 1px solid var(--border); }
-    .step { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-muted); opacity: 0.5; transition: all 0.3s ease; }
-    .step.active { opacity: 1; color: #fff; }
-    .step-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.2); }
-    .step.active .step-icon { background: linear-gradient(135deg, #00b4d8, #06d6a0); border: none; box-shadow: 0 4px 15px rgba(0, 180, 216, 0.5); }
-    .form-section { margin-bottom: 30px; }
-    .form-section-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #fff; }
-    .form-label { font-size: 0.85rem; font-weight: 600; color: var(--secondary); margin-bottom: 8px; display: block; }
-    .form-control, .form-select { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; border-radius: 12px; padding: 12px 16px; transition: all 0.3s; }
-    .form-control:focus, .form-select:focus { background: rgba(255, 255, 255, 0.15); border-color: var(--primary-light); outline: none; box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.2); }
-    .form-control::placeholder { color: rgba(255, 255, 255, 0.5); }
-    .doc-item { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px; margin-bottom: 15px; transition: all 0.3s; }
-    .doc-item:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(6, 214, 160, 0.3); }
-    .form-check { display: flex; align-items: center; gap: 12px; }
-    .form-check-input { width: 22px; height: 22px; background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.3); border-radius: 6px; cursor: pointer; }
-    .form-check-input:checked { background-color: var(--green); border-color: var(--green); }
-    .form-check-label { font-weight: 500; }
-    .upload-area { border: 2px dashed rgba(0, 180, 216, 0.5); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(0, 180, 216, 0.05); margin-top: 10px; }
-    .upload-area:hover { border-color: var(--green); background: rgba(6, 214, 160, 0.1); transform: translateY(-2px); }
-    .upload-area svg { width: 32px; height: 32px; fill: var(--secondary); margin-bottom: 8px; }
-    .upload-status { font-size: 0.85rem; margin-top: 10px; display: block; color: var(--text-muted); }
-    .upload-status.staged { color: #ffd166; }
-    .upload-status.success { color: var(--green); }
-    .upload-status.error { color: #ff6b6b; }
-    .progress-upload { height: 8px; background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden; margin-top: 10px; }
-    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #00b4d8, #06d6a0); width: 0%; transition: width 0.3s ease; }
-    .file-history { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .file-item { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px; font-size: 0.85rem; }
-    .file-item a { color: #90e0ef; text-decoration: none; }
-    .file-item a:hover { color: #06d6a0; }
-    .btn-gradient { background: linear-gradient(135deg, #00b4d8, #06d6a0); border: none; color: #fff; font-weight: 700; padding: 14px 32px; border-radius: 50px; box-shadow: 0 8px 25px rgba(6, 214, 160, 0.4); transition: all 0.3s; }
-    .btn-gradient:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 35px rgba(6, 214, 160, 0.6); }
-    .btn-outline-light-custom { background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 12px 24px; border-radius: 50px; transition: all 0.3s; }
-    .btn-outline-light-custom:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--primary-light); }
-    .list-item { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
-    .list-item:hover { background: var(--surface-hover); transform: translateX(5px); border-color: rgba(0, 180, 216, 0.4); }
-    .badge-custom { background: rgba(6, 214, 160, 0.2); color: #06d6a0; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(6, 214, 160, 0.3); }
+    :root {
+      --bg-1: #0f2027; --bg-2: #203a43; --bg-3: #2c5364;
+      --text: #f1f5f9; --text-muted: #94a3b8;
+      --accent: #38bdf8; --success: #34d399; --danger: #fb7185;
+      --border: rgba(255,255,255,0.15);
+    }
+    body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3)); color: var(--text); min-height: 100vh; padding: 30px; }
+    .login-box { max-width: 450px; margin: 80px auto; background: rgba(15,32,39,0.95); border-radius: 20px; padding: 40px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.4); animation: fadeUp .8s ease; }
+    .login-title { text-align: center; font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
+    .login-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: .9rem; }
+    .role-selector { display: flex; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,.3); padding: 8px; border-radius: 50px; border: 1px solid var(--border); }
+    .role-btn { flex: 1; background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px; border-radius: 40px; font-weight: 600; transition: all .3s; cursor: pointer; }
+    .role-btn.active { background: var(--accent); color: #fff; box-shadow: 0 4px 15px rgba(56,189,248,.4); }
+    .form-control { background: rgba(255,255,255,.1); border: 1px solid var(--border); color: #fff; border-radius: 12px; padding: 12px 16px; }
+    .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(56,189,248,.2); }
+    .btn-gradient { background: linear-gradient(135deg, var(--accent), var(--success)); border: none; color: #fff; font-weight: 700; padding: 14px 32px; border-radius: 50px; width: 100%; margin-top: 10px; }
+    .btn-gradient:hover { transform: translateY(-2px); }
+    .dashboard { display: none; animation: fadeUp .8s ease; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: rgba(15,32,39,.8); border-radius: 20px; padding: 15px 25px; border: 1px solid var(--border); }
+    .header-title h2 { font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0; }
+    .header-title p { color: var(--text-muted); font-size: .85rem; margin: 5px 0 0; }
+    .btn-outline-light-custom { background: transparent; border: 1px solid var(--border); color: #fff; padding: 10px 20px; border-radius: 50px; }
+    .filter-box { background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 25px; }
+    .form-select { background: rgba(255,255,255,.1); border: 1px solid var(--border); color: #fff; border-radius: 12px; padding: 10px 15px; }
+    .form-select option { background: #0f2027; color: #fff; }
+    .card-pengajuan { background: rgba(255,255,255,.08); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 15px; transition: all .3s; cursor: pointer; }
+    .card-pengajuan:hover { background: rgba(255,255,255,.15); transform: translateX(5px); }
+    .modal-content { background: linear-gradient(135deg, #101f2c, #1b2a38); border: 1px solid var(--border); border-radius: 20px; color: #fff; }
+    .doc-item { border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 10px; background: rgba(255,255,255,.05); }
+    .btn-sm-custom { padding: 6px 12px; font-size: .8rem; border-radius: 20px; border: none; display: inline-flex; align-items: center; gap: 5px; transition: all .3s; }
+    .btn-view { background: rgba(56,189,248,.15); color: var(--accent); border: 1px solid var(--accent); }
+    .btn-view:hover { background: var(--accent); color: #fff; }
+    .btn-approve { background: rgba(52,211,153,.15); color: var(--success); border: 1px solid var(--success); }
+    .btn-approve:hover { background: var(--success); color: #fff; }
+    .btn-reject { background: rgba(251,113,133,.15); color: var(--danger); border: 1px solid var(--danger); }
+    .btn-reject:hover { background: var(--danger); color: #fff; }
+    .btn-sm-custom svg { width: 14px; height: 14px; fill: currentColor; }
+    .viewer-modal .modal-content { background: #000; border: none; border-radius: 12px; }
+    .viewer-modal iframe { width: 100%; height: 85vh; border: none; background: #fff; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    .fade-up { animation: fadeUp 0.6s ease; }
-    .hidden { display: none !important; }
-    /* MODAL MODERN */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
-    .modal-overlay.active { opacity: 1; visibility: visible; }
-    .custom-modal { background: linear-gradient(135deg, #0f2027, #203a43); border: 2px solid var(--green); border-radius: 20px; padding: 30px; max-width: 420px; width: 90%; text-align: center; transform: scale(0.9); transition: transform 0.3s ease; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
-    .modal-overlay.active .custom-modal { transform: scale(1); }
-    .modal-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; }
-    .modal-icon.success { background: rgba(6,214,160,0.2); color: var(--green); border: 1px solid var(--green); }
-    .modal-icon.error { background: rgba(255,107,107,0.2); color: #ff6b6b; border: 1px solid #ff6b6b; }
-    .modal-icon.info { background: rgba(0,180,216,0.2); color: var(--primary-light); border: 1px solid var(--primary-light); }
-    .modal-text { font-size: 1.1rem; color: #fff; margin-bottom: 25px; font-weight: 500; }
-    .modal-actions { display: flex; justify-content: center; gap: 10px; }
-    /* CAPTCHA TEKS (BARU) */
-    .captcha-box { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-top: 20px; }
-    .captcha-question { font-size: 1.2rem; font-weight: 800; color: #ffd166; letter-spacing: 2px; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 8px; }
-    .captcha-input { width: 120px; text-align: center; }
-    .progress-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 4, 94, 0.85); z-index: 9998; display: flex; justify-content: center; align-items: center; flex-direction: column; opacity: 0; visibility: hidden; transition: all 0.3s; }
-    .progress-overlay.active { opacity: 1; visibility: visible; }
-    .progress-container { width: 80%; max-width: 500px; background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 30px; text-align: center; border: 2px solid var(--green); }
-    .progress-bar-big { height: 20px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; overflow: hidden; margin: 20px 0; }
-    .progress-bar-big-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00b4d8, #06d6a0); transition: width 0.3s ease; }
-    .progress-text { font-size: 1.2rem; font-weight: 700; color: #fff; }
-    /* PENCARIAN */
-    .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-    .search-box input { flex: 1; }
   </style>
 </head>
 <body>
 
-<!-- MODAL MODERN -->
-<div class="modal-overlay" id="customAlertModal">
-  <div class="custom-modal">
-    <div class="modal-icon" id="modalIcon"></div>
-    <p class="modal-text" id="modalText">Pesan</p>
-    <div class="modal-actions">
-      <button class="btn-gradient" onclick="closeModal()">OK, Mengerti</button>
-    </div>
+<!-- LOGIN -->
+<div class="login-box" id="loginBox">
+  <div class="login-title">Admin Verifikasi SKBT</div>
+  <div class="login-subtitle">Inspektorat Daerah Kabupaten Mahakam Ulu</div>
+  <div class="role-selector">
+    <button class="role-btn active" id="btnIrban" onclick="selectRole('irban')">Irban</button>
+    <button class="role-btn" id="btnInspektur" onclick="selectRole('inspektur')">Inspektur</button>
   </div>
+  <div class="mb-3">
+    <label class="form-label" style="color:#94a3b8;">Username</label>
+    <input type="text" id="usernameInput" class="form-control" placeholder="Masukkan username">
+  </div>
+  <div class="mb-3">
+    <label class="form-label" style="color:#94a3b8;">Password</label>
+    <input type="password" id="passwordInput" class="form-control" placeholder="Masukkan password">
+  </div>
+  <button class="btn-gradient" onclick="login()">Masuk</button>
+  <div class="error-msg" id="loginError"></div>
 </div>
 
-<!-- PROGRESS OVERLAY -->
-<div class="progress-overlay" id="progressOverlay">
-  <div class="progress-container">
-    <h3 style="color: #fff;">Sedang Mengirim Pengajuan...</h3>
-    <div class="progress-bar-big"><div class="progress-bar-big-fill" id="progressBarBigFill"></div></div>
-    <div class="progress-text" id="progressText">0%</div>
-  </div>
-</div>
-
-<div class="container">
-  <!-- HEADER LOGO -->
+<!-- DASHBOARD -->
+<div class="container dashboard" id="dashboard">
   <div class="header">
-    <div class="logo-wrapper">
-      <img src="/logo-mahakam.png" alt="Logo Kabupaten Mahakam Ulu" title="Pemerintah Kabupaten Mahakam Ulu">
-    </div>
     <div class="header-title">
-      <h1>Pengajuan SKBT</h1>
-      <p>Surat Keterangan Bebas Temuan - Inspektorat Daerah Kabupaten Mahakam Ulu</p>
+      <h2>Dashboard Verifikasi SKBT</h2>
+      <p id="roleInfo">Role: -</p>
     </div>
-    <div class="logo-wrapper">
-      <img src="/logo-inspektorat.png" alt="Logo Inspektorat" title="Inspektorat Daerah Kabupaten Mahakam Ulu">
+    <button class="btn-outline-light-custom" onclick="logout()">Keluar</button>
+  </div>
+  <div class="filter-box">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label style="color:#94a3b8;">Filter Status</label>
+        <select id="filterStatus" class="form-select mt-2" onchange="loadPengajuan()">
+          <option value="all">Semua Status</option>
+          <option value="Draft">Draft</option>
+          <option value="Sedang Verifikasi">Sedang Verifikasi</option>
+          <option value="Diverifikasi oleh Irban">Diverifikasi oleh Irban</option>
+          <option value="Menunggu Persetujuan Inspektur">Menunggu Persetujuan Inspektur</option>
+          <option value="Disetujui oleh Inspektur">Disetujui oleh Inspektur</option>
+          <option value="Ditolak">Ditolak</option>
+        </select>
+      </div>
+      <div class="col-md-6 d-flex align-items-end">
+        <button class="btn-outline-light-custom w-100" onclick="loadPengajuan()">Refresh Data</button>
+      </div>
     </div>
   </div>
+  <div id="pengajuanList"></div>
+</div>
 
-  <div class="hero">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h4 class="form-section-title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;">
-            <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
-          </svg>
-          Aplikasi Pengajuan SKBT
-        </h4>
+<!-- MODAL DETAIL -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detail Pengajuan</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <button class="btn-outline-light-custom" onclick="tampilkanPengajuan()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
-          <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
-        </svg>
-        Lihat Pengajuan
-      </button>
-    </div>
-
-    <!-- STEP INDICATOR -->
-    <div class="step-indicator">
-      <div class="step active" id="step1"><span class="step-icon">1</span> Data Pemohon</div>
-      <div class="step" id="step2"><span class="step-icon">2</span> Upload Dokumen</div>
-      <div class="step" id="step3"><span class="step-icon">3</span> Selesai</div>
-    </div>
-
-    <!-- ===== HALAMAN 1: DATA PEMOHON ===== -->
-    <div id="halaman1" class="fade-up">
-      <div class="form-section">
-        <h4 class="form-section-title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
-          Data Pemohon
-        </h4>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Nama Lengkap</label>
-            <input type="text" id="nama" class="form-control" placeholder="Nama Pemohon">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">NIP</label>
-            <input type="text" id="nip" class="form-control" placeholder="NIP">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Jabatan</label>
-            <input type="text" id="jabatan" class="form-control" placeholder="Jabatan">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Unit Kerja / OPD</label>
-            <input type="text" id="unit" class="form-control" placeholder="Unit Kerja">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Nomor HP / WhatsApp Aktif</label>
-            <input type="text" id="nomor_hp" class="form-control" placeholder="08xxxxxxxxxx">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Gmail Aktif</label>
-            <input type="email" id="gmail" class="form-control" placeholder="example@gmail.com">
-          </div>
-        </div>
+      <div class="modal-body" id="detailBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
       </div>
-      <div class="d-flex justify-content-end mt-4">
-        <button class="btn-gradient" onclick="lanjutKeUpload()">Lanjut Upload Dokumen</button>
-      </div>
-    </div>
-
-    <!-- ===== HALAMAN 2: UPLOAD DOKUMEN ===== -->
-    <div id="halaman2" class="hidden">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="form-section-title mb-0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;">
-            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-          </svg>
-          Dokumen yang Diperlukan
-        </h4>
-        <button class="btn-outline-light-custom" onclick="kembaliKeHalaman1()">← Kembali</button>
-      </div>
-      <div id="daftarDokumen" class="row g-3"></div>
-      
-      <!-- CAPTCHA TEKS -->
-      <div class="captcha-box">
-        <span class="captcha-question" id="captchaQuestion">KATA</span>
-        <input type="text" id="captchaInput" class="form-control captcha-input" placeholder="Ketik di sini">
-        <button class="btn-outline-light-custom btn-sm" onclick="generateCaptcha()">🔄</button>
-      </div>
-
-      <div class="d-flex justify-content-end mt-4">
-        <button class="btn-gradient" onclick="submitAkhir()">Kirim Pengajuan</button>
-      </div>
-    </div>
-
-    <!-- ===== HALAMAN 3: SUKSES ===== -->
-    <div id="halaman3" class="hidden text-center">
-      <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-      </svg>
-      <h3 class="mt-3">Pengajuan Berhasil Dikirim!</h3>
-      <h4 class="text-warning mt-3" id="nomorSKBT" style="font-size: 1.5rem; font-weight: 800; letter-spacing: 1px;"></h4>
-      <p class="text-muted mt-2">Notifikasi email telah dikirim ke Admin. Dokumen telah diupload ke Google Drive.</p>
-      <button class="btn-gradient mt-3" onclick="resetForm()">Buat Pengajuan Baru</button>
-    </div>
-
-    <!-- ===== DAFTAR PENGAJUAN ===== -->
-    <div id="listPengajuan" class="hidden">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="form-section-title mb-0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color:#00b4d8;">
-            <path d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H14V18H4V16Z"/>
-          </svg>
-          Daftar Pengajuan
-        </h4>
-        <button class="btn-outline-light-custom" onclick="kembaliKeFormAwal()">← Kembali</button>
-      </div>
-      
-      <!-- PENCARIAN -->
-      <div class="search-box">
-        <input type="text" id="searchInput" class="form-control" placeholder="Cari berdasarkan No. SKBT, Nama, atau Unit Kerja...">
-        <button class="btn-outline-light-custom" onclick="filterPengajuan()">Cari</button>
-      </div>
-
-      <div id="listContainer"></div>
-      <div id="emptySearch" class="hidden" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada pengajuan ditemukan.</div>
     </div>
   </div>
 </div>
 
+<!-- MODAL VIEWER -->
+<div class="modal fade viewer-modal" id="viewerModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewerTitle">View File</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <iframe id="viewerFrame" src="" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // ===== FUNGSI MODAL MODERN =====
-  function showCustomAlert(message, type = 'info') {
-    const overlay = document.getElementById('customAlertModal');
-    const icon = document.getElementById('modalIcon');
-    const text = document.getElementById('modalText');
+  const API = '/adminHandler?action=';
+  let currentRole = sessionStorage.getItem('adminRole') || '';
+  let currentUsername = sessionStorage.getItem('adminUser') || '';
+  let currentDetailId = null;
 
-    text.innerText = message;
-    icon.className = 'modal-icon ' + type;
+  function selectRole(role) {
+    currentRole = role;
+    document.getElementById('btnIrban').classList.toggle('active', role === 'irban');
+    document.getElementById('btnInspektur').classList.toggle('active', role === 'inspektur');
+  }
 
-    let svgContent = '';
-    if (type === 'success') {
-      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
-    } else if (type === 'error') {
-      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
-    } else {
-      svgContent = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+  function login() {
+    const username = document.getElementById('usernameInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    const errorMsg = document.getElementById('loginError');
+    errorMsg.innerText = '';
+
+    if (!currentRole) {
+      errorMsg.innerText = 'Pilih role terlebih dahulu!';
+      return;
     }
 
-    icon.innerHTML = svgContent;
-    overlay.classList.add('active');
-  }
-
-  function closeModal() {
-    document.getElementById('customAlertModal').classList.remove('active');
-  }
-
-  // ===== FUNGSI PROGRESS OVERLAY =====
-  function showProgressOverlay() {
-    document.getElementById('progressOverlay').classList.add('active');
-    document.getElementById('progressBarBigFill').style.width = '0%';
-    document.getElementById('progressText').innerText = '0%';
-  }
-  
-  function updateProgress(percent) {
-    document.getElementById('progressBarBigFill').style.width = percent + '%';
-    document.getElementById('progressText').innerText = percent + '%';
-  }
-
-  function hideProgressOverlay() {
-    document.getElementById('progressOverlay').classList.remove('active');
-  }
-
-  // ===== CAPTCHA TEKS (BARU) =====
-  let captchaResult = "";
-  const captchaWords = ['KUCING', 'MEJA', 'BUKU', 'SUNGAI', 'BINTANG', 'POHON', 'RUMAH'];
-  function generateCaptcha() {
-    captchaResult = captchaWords[Math.floor(Math.random() * captchaWords.length)];
-    document.getElementById('captchaQuestion').innerText = captchaResult;
-    document.getElementById('captchaInput').value = '';
-  }
-
-  // ===== LOGIKA VALIDASI UPLOAD =====
-  let uploadedDocs = new Set();
-  let uploadedDocCount = {};
-
-  async function callServer(action, params = {}) {
-    const res = await fetch('/skbtHandler?action=' + action, {
+    fetch(API + 'adminLogin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params)
-    });
-    return await res.json();
-  }
-
-  // Daftar dokumen: SK Bebas Masalah & Piutang MAKSIMAL 1 FILE
-  const dokumenList = [
-    { code: 'SKCPNS_PNS', nama: 'SK CPNS / PNS', maxFiles: 2 },
-    { code: 'SKPangkat', nama: 'SK Pangkat Terakhir', maxFiles: 1 },
-    { code: 'SKJabatan', nama: 'SK Jabatan Terakhir', maxFiles: 1 },
-    { code: 'SKP', nama: 'SKP 1 atau 2 Tahun Terakhir', maxFiles: 1 },
-    { code: 'SuratPermohonan', nama: 'Surat Permohonan', maxFiles: 1 },
-    { code: 'SuratPengantar', nama: 'Surat Pengantar dari Pimpinan OPD', maxFiles: 1 },
-    { code: 'SKBebas', nama: 'SK Bebas Masalah & Bebas Hutang/Piutang', maxFiles: 1 }
-  ];
-
-  let currentSubmissionId = null;
-  let namaPemohon = "";
-  let allPengajuanData = [];
-
-  async function lanjutKeUpload() {
-    const nama = document.getElementById('nama').value;
-    const nip = document.getElementById('nip').value;
-    const jabatan = document.getElementById('jabatan').value;
-    const unit = document.getElementById('unit').value;
-    const nomor_hp = document.getElementById('nomor_hp').value;
-    const gmail = document.getElementById('gmail').value;
-
-    if (!nama || !unit || !nomor_hp || !gmail) {
-      showCustomAlert('Nama, Unit Kerja, Nomor HP, dan Gmail wajib diisi!', 'error');
-      return;
-    }
-
-    uploadedDocs = new Set();
-    uploadedDocCount = {};
-
-    const res = await callServer('submitPengajuan', {
-      nama_pemohon: nama, nip: nip, jabatan: jabatan, unit_kerja: unit, nomor_hp: nomor_hp, gmail: gmail
-    });
-
-    if (res.status === 'success') {
-      currentSubmissionId = res.id;
-      namaPemohon = nama;
-      document.getElementById('halaman1').classList.add('hidden');
-      document.getElementById('halaman2').classList.remove('hidden');
-      document.getElementById('step1').classList.remove('active');
-      document.getElementById('step2').classList.add('active');
-      renderDokumen();
-      generateCaptcha();
-      showCustomAlert('Data tersimpan! Silakan upload semua dokumen yang dicentang.', 'success');
-    } else {
-      showCustomAlert('Gagal: ' + res.msg, 'error');
-    }
-  }
-
-  function renderDokumen() {
-    const container = document.getElementById('daftarDokumen');
-    container.innerHTML = dokumenList.map(doc => `
-      <div class="col-md-6">
-        <div class="doc-item">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="chk_${doc.code}" onchange="toggleUpload('${doc.code}')">
-            <label class="form-check-label" for="chk_${doc.code}">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color:#90e0ef; margin-right:8px;">
-                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-              </svg>
-              ${doc.nama} ${doc.maxFiles ? '(maks. ' + doc.maxFiles + ' file)' : ''}
-            </label>
-          </div>
-          <div id="upload_${doc.code}" class="hidden">
-            <div class="upload-area" onclick="document.getElementById('file_${doc.code}').click()">
-              <svg viewBox="0 0 24 24">
-                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-              </svg>
-              <p class="mb-0">Klik untuk Upload (${doc.maxFiles > 1 ? 'bisa ' + doc.maxFiles + ' file' : '1 file'})</p>
-              <input type="file" id="file_${doc.code}" style="display:none;" onchange="uploadFile('${doc.code}')">
-              <div class="progress-upload hidden" id="progress_${doc.code}">
-                <div class="progress-bar-fill" id="bar_${doc.code}"></div>
-              </div>
-              <small id="status_${doc.code}" class="upload-status"></small>
-            </div>
-            <div id="filehistory_${doc.code}" class="file-history"></div>
-          </div>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  function toggleUpload(code) {
-    const checked = document.getElementById('chk_' + code).checked;
-    const uploadDiv = document.getElementById('upload_' + code);
-    if (checked) {
-      uploadDiv.classList.remove('hidden');
-      renderFileHistory(code);
-    } else {
-      uploadDiv.classList.add('hidden');
-      uploadedDocs.delete(code);
-    }
-  }
-
-  async function renderFileHistory(code) {
-    if (!currentSubmissionId) return;
-    const res = await callServer('getPengajuanById', { id: currentSubmissionId });
-    if (res.status === 'success') {
-      const docs = res.documents.filter(d => d.dokumen_code === code);
-      const historyDiv = document.getElementById('filehistory_' + code);
-      historyDiv.innerHTML = '';
-      docs.forEach(doc => {
-        historyDiv.innerHTML += `
-          <div class="file-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:#06d6a0;">
-              <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-            </svg>
-            <a href="${doc.file_url}" target="_blank">${doc.file_name}</a>
-          </div>`;
-      });
-    }
-  }
-
-  async function uploadFile(code) {
-    const input = document.getElementById('file_' + code);
-    if (!input.files.length) return;
-    const file = input.files[0];
-
-    const docInfo = dokumenList.find(d => d.code === code);
-    const maxFiles = docInfo ? docInfo.maxFiles : 1;
-
-    const currentCount = uploadedDocCount[code] || 0;
-    if (currentCount >= maxFiles) {
-      showCustomAlert('Maksimal ' + maxFiles + ' file untuk ' + docInfo.nama, 'error');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      showCustomAlert('File ' + file.name + ' melebihi 5MB! Silakan kompres atau pilih file lain.', 'error');
-      return;
-    }
-
-    const reader = new FileReader();
-    const progressDiv = document.getElementById('progress_' + code);
-    const bar = document.getElementById('bar_' + code);
-    const status = document.getElementById('status_' + code);
-
-    progressDiv.classList.remove('hidden');
-    bar.style.width = '0%';
-    status.innerText = 'Uploading...';
-    status.classList.remove('success', 'error', 'staged');
-
-    reader.onprogress = function(e) {
-      if (e.lengthComputable) {
-        bar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
-      }
-    };
-
-    reader.onload = async (e) => {
-      const base64 = e.target.result.split(',')[1];
-      try {
-        const res = await callServer('uploadDocument', {
-          submission_id: currentSubmissionId,
-          dokumen_code: code,
-          nama_dokumen: docInfo.nama,
-          file_name: file.name,
-          file_data: base64,
-          nama_pemohon: namaPemohon
-        });
-        if (res.status === 'success') {
-          bar.style.width = '100%';
-          status.innerText = 'Tersimpan (Menunggu Finalisasi)';
-          status.classList.add('staged');
-          uploadedDocs.add(code);
-          uploadedDocCount[code] = (uploadedDocCount[code] || 0) + 1;
-          setTimeout(() => progressDiv.classList.add('hidden'), 2000);
-          renderFileHistory(code);
-        } else {
-          bar.style.width = '0%';
-          status.innerText = 'Gagal: ' + res.msg;
-          status.classList.add('error');
-        }
-      } catch (err) {
-        bar.style.width = '0%';
-        status.innerText = 'Gagal: Server Error (503). Coba file lebih kecil.';
-        status.classList.add('error');
-        console.error('Upload error:', err);
-      }
-    };
-    reader.readAsDataURL(file);
-  }
-
-  async function submitAkhir() {
-    // 1. Validasi CAPTCHA TEKS
-    const captchaInput = document.getElementById('captchaInput').value.toUpperCase().trim();
-    if (captchaInput !== captchaResult) {
-      showCustomAlert('Captcha salah! Silakan coba lagi.', 'error');
-      generateCaptcha();
-      return;
-    }
-
-    // 2. Validasi semua dokumen wajib diupload
-    const checkedCodes = [];
-    dokumenList.forEach(d => {
-      if (document.getElementById('chk_' + d.code).checked) {
-        checkedCodes.push(d.code);
-      }
-    });
-
-    const allUploaded = checkedCodes.every(code => uploadedDocs.has(code) && uploadedDocCount[code] > 0);
-
-    if (!allUploaded) {
-      const missingDocs = checkedCodes.filter(code => !uploadedDocs.has(code));
-      const missingNames = missingDocs.map(code => {
-        const doc = dokumenList.find(d => d.code === code);
-        return doc ? doc.nama : code;
-      }).join(', ');
-
-      showCustomAlert('Semua dokumen yang dicentang WAJIB diupload!\nDokumen yang belum diupload: ' + missingNames, 'error');
-      return;
-    }
-
-    showProgressOverlay();
-    updateProgress(10);
-
-    try {
-      const res = await callServer('finalizeSubmission', {
-        submission_id: currentSubmissionId,
-        nama_pemohon: namaPemohon
-      });
-
-      updateProgress(80);
-
+      body: JSON.stringify({ username, password })
+    })
+    .then(r => r.json())
+    .then(res => {
       if (res.status === 'success') {
-        updateProgress(100);
-        setTimeout(() => {
-          hideProgressOverlay();
-          document.getElementById('halaman2').classList.add('hidden');
-          document.getElementById('halaman3').classList.remove('hidden');
-          document.getElementById('step2').classList.remove('active');
-          document.getElementById('step3').classList.add('active');
-          document.getElementById('nomorSKBT').innerText = res.nomor_pengajuan;
-          showCustomAlert('Pengajuan berhasil dikirim! Dokumen telah diupload ke Drive.', 'success');
-        }, 500);
+        sessionStorage.setItem('adminRole', res.role);
+        sessionStorage.setItem('adminUser', username);
+        currentUsername = username;
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('roleInfo').innerText = 'Role: ' + (currentRole === 'irban' ? 'Irban' : 'Inspektur') + ' | User: ' + currentUsername;
+        loadPengajuan();
       } else {
-        hideProgressOverlay();
-        showCustomAlert('Gagal: ' + res.msg, 'error');
+        errorMsg.innerText = res.msg;
       }
-    } catch (err) {
-      hideProgressOverlay();
-      showCustomAlert('Server error (503). Coba lagi beberapa saat.', 'error');
+    })
+    .catch(err => { errorMsg.innerText = 'Koneksi error, coba lagi.'; });
+  }
+
+  function logout() {
+    sessionStorage.removeItem('adminRole');
+    sessionStorage.removeItem('adminUser');
+    currentRole = '';
+    currentUsername = '';
+    document.getElementById('usernameInput').value = '';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('loginBox').style.display = 'block';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('loginError').innerText = '';
+    document.getElementById('btnIrban').classList.add('active');
+    document.getElementById('btnInspektur').classList.remove('active');
+  }
+
+  async function callAdmin(action, params = {}) {
+    try {
+      const res = await fetch(API + action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      });
+      return await res.json();
+    } catch (e) {
+      console.error('Fetch error:', e);
+      return { status: 'error', msg: 'Koneksi ke server gagal' };
     }
   }
 
-  function resetForm() {
-    document.getElementById('halaman1').classList.remove('hidden');
-    document.getElementById('halaman2').classList.add('hidden');
-    document.getElementById('halaman3').classList.add('hidden');
-    document.getElementById('step3').classList.remove('active');
-    document.getElementById('step1').classList.add('active');
-    ['nama', 'nip', 'jabatan', 'unit', 'nomor_hp', 'gmail'].forEach(id => document.getElementById(id).value = '');
-    currentSubmissionId = null;
-    namaPemohon = "";
-    uploadedDocs = new Set();
-    uploadedDocCount = {};
-    document.getElementById('listPengajuan').classList.add('hidden');
-  }
+  async function loadPengajuan() {
+    const status = document.getElementById('filterStatus').value;
+    const data = await callAdmin('adminGetAllPengajuan', { status });
+    const list = document.getElementById('pengajuanList');
+    list.innerHTML = '';
 
-  function kembaliKeHalaman1() {
-    document.getElementById('halaman2').classList.add('hidden');
-    document.getElementById('halaman1').classList.remove('hidden');
-    document.getElementById('step1').classList.add('active');
-    document.getElementById('step2').classList.remove('active');
-  }
-
-  // ===== DAFTAR PENGAJUAN + PENCARIAN =====
-  async function tampilkanPengajuan() {
-    document.getElementById('halaman1').classList.add('hidden');
-    document.getElementById('halaman2').classList.add('hidden');
-    document.getElementById('listPengajuan').classList.remove('hidden');
-    document.getElementById('searchInput').value = '';
-    
-    const res = await callServer('getAllPengajuan');
-    allPengajuanData = res;
-    renderListPengajuan(allPengajuanData);
-  }
-
-  function renderListPengajuan(data) {
-    const list = document.getElementById('listContainer');
-    const empty = document.getElementById('emptySearch');
-    
-    if (!data || data.length === 0) {
-      list.innerHTML = '';
-      empty.classList.remove('hidden');
+    if (!Array.isArray(data) || data.length === 0) {
+      list.innerHTML = '<div class="text-center text-muted py-5">Tidak ada pengajuan ditemukan.</div>';
       return;
     }
+
+    data.forEach(item => {
+      let badgeClass = 'bg-warning text-dark';
+      if (item.status_verifikasi === 'Ditolak') badgeClass = 'bg-danger';
+      else if (item.status_verifikasi === 'Disetujui oleh Inspektur' || item.status_verifikasi === 'Diverifikasi oleh Irban' || item.status_verifikasi === 'Diverifikasi' || item.status_verifikasi === 'Selesai') badgeClass = 'bg-success';
+      
+      list.innerHTML += `
+        <div class="card-pengajuan" onclick="showDetail(${item.id})">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1" style="color:#fff;">${item.nomor_pengajuan}</h6>
+              <p class="mb-1"><strong style="color:#94a3b8;">${item.nama_pemohon}</strong> - ${item.unit_kerja}</p>
+              <small style="color:#64748b;">${item.created_at || ''}</small>
+            </div>
+            <span class="badge ${badgeClass} badge-custom">${item.status_verifikasi}</span>
+          </div>
+        </div>`;
+    });
+  }
+
+  async function showDetail(id) {
+    currentDetailId = id;
+    const data = await callAdmin('adminGetPengajuanById', { id });
+    if (!data.submission) return;
+    const sub = data.submission;
+    const docs = data.documents;
     
-    empty.classList.add('hidden');
-    list.innerHTML = data.map(s => `
-      <div class="list-item">
-        <div>
-          <strong style="color:#fff;">${s.nomor_pengajuan}</strong> - ${s.nama_pemohon} (${s.unit_kerja})
-          <br><small style="color:#adb5bd;">${s.status_verifikasi}</small>
-        </div>
+    let html = `
+      <div class="row mb-3">
+        <div class="col-md-6"><strong>Nomor:</strong> ${sub.nomor_pengajuan}</div>
+        <div class="col-md-6"><strong>Status:</strong> <span class="badge bg-info text-dark">${sub.status_verifikasi}</span></div>
       </div>
-    `).join('');
+      <div class="row mb-3">
+        <div class="col-md-6"><strong>Nama:</strong> ${sub.nama_pemohon}</div>
+        <div class="col-md-6"><strong>NIP:</strong> ${sub.nip || '-'}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6"><strong>Jabatan:</strong> ${sub.jabatan || '-'}</div>
+        <div class="col-md-6"><strong>Unit Kerja:</strong> ${sub.unit_kerja}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6"><strong>No HP:</strong> ${sub.nomor_hp || '-'}</div>
+        <div class="col-md-6"><strong>Email:</strong> ${sub.gmail || '-'}</div>
+      </div>
+      <hr>
+      <h6 class="mb-3">Dokumen</h6>
+      <div id="docList">`;
+
+    docs.forEach(doc => {
+      const status = doc.verification_status || 'pending';
+      let badge = 'bg-warning text-dark';
+      if (status === 'approved') badge = 'bg-success';
+      else if (status === 'rejected') badge = 'bg-danger';
+      
+      html += `
+        <div class="doc-item">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <a href="${doc.file_url}" target="_blank" style="color:#38bdf8; text-decoration:none;">${doc.file_name}</a>
+              <br><small style="color:#94a3b8;">${doc.nama_dokumen}</small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge ${badge}">${status}</span>
+              <button class="btn-sm-custom btn-view" onclick="viewFile('${doc.file_url}', '${doc.file_name}')">
+                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                View
+              </button>`;
+
+      // Hanya Irban yang bisa verifikasi dokumen per file
+      if (currentRole === 'irban') {
+        html += `
+              <button class="btn-sm-custom btn-approve" onclick="verifDoc(${doc.id}, 'approved')">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Setujui
+              </button>
+              <button class="btn-sm-custom btn-reject" onclick="verifDoc(${doc.id}, 'rejected')">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                Tolak
+              </button>`;
+      }
+
+      html += `
+            </div>
+          </div>
+          ${doc.verification_note ? `<small class="text-muted d-block mt-2">Catatan: ${doc.verification_note}</small>` : ''}`;
+      
+      if (currentRole === 'irban') {
+        html += `<input type="text" id="note_${doc.id}" class="form-control form-control-sm mt-2" placeholder="Catatan verifikasi (opsional)" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff;">`;
+      }
+
+      html += `</div>`;
+    });
+
+    // ===== UPDATE STATUS KESELURUHAN =====
+    html += `</div><hr><h6 class="mb-3">Update Status Keseluruhan</h6>
+      <select id="newStatus" class="form-select mb-2">`;
+
+    if (currentRole === 'irban') {
+      html += `
+        <option value="Draft">Draft</option>
+        <option value="Sedang Verifikasi" selected>Sedang Verifikasi</option>
+        <option value="Diverifikasi oleh Irban">Diverifikasi oleh Irban</option>
+        <option value="Menunggu Persetujuan Inspektur">Menunggu Persetujuan Inspektur</option>
+        <option value="Ditolak">Ditolak</option>`;
+    } else if (currentRole === 'inspektur') {
+      html += `
+        <option value="Menunggu Persetujuan Inspektur" selected>Menunggu Persetujuan Inspektur</option>
+        <option value="Disetujui oleh Inspektur">Disetujui oleh Inspektur</option>
+        <option value="Ditolak">Ditolak</option>`;
+    }
+
+    html += `
+      </select>
+      <input type="text" id="statusNote" class="form-control mb-2" placeholder="Catatan untuk pemohon (opsional)">
+      <button class="btn-gradient" style="width:auto; margin-top:10px;" onclick="updateStatus(${sub.id})">Update Status</button>`;
+
+    document.getElementById('detailBody').innerHTML = html;
+    
+    const modalEl = document.getElementById('detailModal');
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modalInstance.show();
   }
 
-  function filterPengajuan() {
-    const query = document.getElementById('searchInput').value.toLowerCase().trim();
-    if (!query) {
-      renderListPengajuan(allPengajuanData);
+  // ===== VIEW FILE - PERBAIKAN: Gunakan Google Docs Viewer untuk SEMUA file =====
+  function viewFile(fileUrl, fileName) {
+    // Gunakan Google Docs Viewer agar browser tidak memuat langsung dari R2
+    // Google Docs Viewer mampu menampilkan PDF, gambar, dan file Office
+    const viewerUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(fileUrl) + '&embedded=true';
+
+    document.getElementById('viewerTitle').innerText = fileName;
+    document.getElementById('viewerFrame').src = viewerUrl;
+    
+    const modalEl = document.getElementById('viewerModal');
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modalInstance.show();
+  }
+
+  // ===== VERIFIKASI DOKUMEN (TANPA MENUTUP MODAL) =====
+  async function verifDoc(docId, status) {
+    const catatan = document.getElementById('note_' + docId).value;
+    const res = await callAdmin('adminUpdateDokumenVerifikasi', { doc_id: docId, status, catatan });
+    if (res.status !== 'success') {
+      alert('Gagal: ' + res.msg);
       return;
     }
-    
-    const filtered = allPengajuanData.filter(s => 
-      (s.nomor_pengajuan && s.nomor_pengajuan.toLowerCase().includes(query)) ||
-      (s.nama_pemohon && s.nama_pemohon.toLowerCase().includes(query)) ||
-      (s.unit_kerja && s.unit_kerja.toLowerCase().includes(query))
-    );
-    renderListPengajuan(filtered);
+    showDetail(currentDetailId);
   }
 
-  function kembaliKeFormAwal() {
-    document.getElementById('listPengajuan').classList.add('hidden');
-    document.getElementById('halaman1').classList.remove('hidden');
-    document.getElementById('step1').classList.add('active');
-    document.getElementById('step2').classList.remove('active');
+  // ===== UPDATE STATUS KESELURUHAN (MENUTUP MODAL) =====
+  async function updateStatus(id) {
+    const status = document.getElementById('newStatus').value;
+    const catatan = document.getElementById('statusNote').value;
+    const res = await callAdmin('adminUpdateStatusPengajuan', { id, status, catatan });
+    if (res.status !== 'success') {
+      alert('Gagal: ' + res.msg);
+      return;
+    }
+    const modalEl = document.getElementById('detailModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.hide();
+    loadPengajuan();
   }
 
-  // Inisialisasi
-  document.getElementById('daftarDokumen').innerHTML = '';
-  generateCaptcha();
+  // ===== INISIALISASI HALAMAN =====
+  document.addEventListener('DOMContentLoaded', () => {
+    if (currentRole && currentUsername) {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      if (currentRole === 'irban') {
+        document.getElementById('btnIrban').classList.add('active');
+        document.getElementById('btnInspektur').classList.remove('active');
+      } else {
+        document.getElementById('btnInspektur').classList.add('active');
+        document.getElementById('btnIrban').classList.remove('active');
+      }
+      document.getElementById('roleInfo').innerText = 'Role: ' + (currentRole === 'irban' ? 'Irban' : 'Inspektur') + ' | User: ' + currentUsername;
+      loadPengajuan();
+    } else {
+      selectRole('irban');
+    }
+  });
 </script>
 
 </body>
