@@ -208,7 +208,6 @@ function showSuccess(res){
   if(g.editUrl)actions.push(`<a class="action-link" href="${g.editUrl}" target="_blank" rel="noopener">✎ Buka & Edit Google Docs</a>`);
   if(g.pdfUrl)actions.push(`<a class="action-link" href="${g.pdfUrl}" target="_blank" rel="noopener">⇩ Download PDF</a>`);
   if(g.docxUrl)actions.push(`<a class="action-link" href="${g.docxUrl}" target="_blank" rel="noopener">⇩ Download DOCX</a>`);
-  if(res.gdrive_folder_url)actions.push(`<a class="action-link" href="${res.gdrive_folder_url}" target="_blank" rel="noopener">▣ Buka Folder Google Drive</a>`);
   document.getElementById('docActions').innerHTML=actions.join('');
   document.getElementById('docAccessNote').innerText=res.editor_access_granted===false?'Form sudah dibuat di Google Docs, tetapi pemberian akses edit ke Gmail pemohon gagal. Admin Google Workspace perlu mengizinkan berbagi ke akun tersebut.':'Nama dan NIP pemohon sudah diisi otomatis. Gunakan Google Docs untuk mengedit sebelum mencetak/mengunduh.';
 }
