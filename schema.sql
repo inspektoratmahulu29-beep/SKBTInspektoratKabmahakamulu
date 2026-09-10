@@ -1,6 +1,6 @@
 -- ============================================================================
--- SKBT DATABASE SCHEMA V2
--- Jalankan migration_v2.sql pada database lama sebelum memakai versi ini.
+-- SKBT DATABASE SCHEMA V3.1
+-- Untuk database lama, jalankan migration_v3.sql sekali. Database baru bisa langsung memakai schema ini.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS skbt_submissions (
