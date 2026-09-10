@@ -328,15 +328,16 @@ function buildApplicationLetterHtml(submission) {
 <html><head><meta charset="utf-8"><style>
 @page { size: A4; margin: 17mm 18mm 18mm 18mm; }
 body { font-family: 'Times New Roman', Times, serif; color:#222; font-size:12pt; line-height:1.42; margin:0; }
-.letterhead { width:100%; border-collapse:collapse; margin:0 0 5px; }
+.letterhead { width:100%; border-collapse:collapse; margin:0 0 5px; border:1.5px solid #000; }
+.letterhead td+td { border-left:1.5px solid #000; }
 .letterhead td { vertical-align:middle; }
 .letterhead-logo { width:88px; text-align:left; padding:0 10px 0 0; }
 .letterhead-logo img { width:72px; height:82px; object-fit:contain; }
-.letterhead-title { text-align:center; color:#000; padding-right:10px; }
+.letterhead-title { text-align:center; color:#000; padding-right:10px; font-weight:800; }
 .letterhead-title .agency { font-size:12pt; font-weight:800; letter-spacing:.3px; margin-bottom:5px; }
-.letterhead-title .line1 { font-size:15pt; font-weight:800; letter-spacing:.2px; margin-bottom:2px; }
-.letterhead-title .line2 { font-size:13pt; font-weight:800; letter-spacing:.1px; margin-bottom:2px; }
-.letterhead-title .line3 { font-size:13pt; font-weight:800; letter-spacing:.15px; }
+.letterhead-title .line1 { font-size:15pt; font-weight:800; color:#000; letter-spacing:.2px; margin-bottom:2px; }
+.letterhead-title .line2 { font-size:13pt; font-weight:800; color:#000; letter-spacing:.1px; margin-bottom:2px; }
+.letterhead-title .line3 { font-size:13pt; font-weight:800; color:#000; letter-spacing:.15px; }
 .letterhead-rule { border-top:2px solid #000; border-bottom:1px solid #c2a45a; height:4px; margin:0 0 18px; }
 .meta { width:100%; border-collapse:collapse; margin-bottom:16px; }
 .meta td { padding:2px 0; vertical-align:top; color:#222; }
@@ -357,7 +358,8 @@ li { margin-bottom:5px; }
 .sig-space { height:120px; line-height:16px; font-size:11pt; }
 .signature-uptd .bottom .sig-space { height:95px; }
 .sig-line { margin-top:2px; }
-.footer-date { text-align:right; margin-top:12px; color:#222; }
+.footer-date { text-align:right; color:#222; }
+.top-date { margin:0 0 5px; }
 .small { font-size:9pt; color:#666; }
 .note { color:#174e49; font-size:9pt; margin-top:18px; }
 </style></head><body>
@@ -367,7 +369,7 @@ li { margin-bottom:5px; }
       <td class="letterhead-title">
         <div class="line1">SURAT PERMOHONAN</div>
         <div class="line2">PENERBITAN SURAT KETERANGAN BEBAS TEMUAN (SKBT)</div>
-        <div class="line3">INSPEKTORAT DAERAH MAHAKAM ULU</div>
+        <div class="line3">INSPEKTORAT DAERAH KABUPATEN MAHAKAM ULU</div>
       </td>
     </tr>
   </table>
@@ -414,12 +416,12 @@ li { margin-bottom:5px; }
         <div class="sig-line">(....................................................)</div>
       </td>
       <td class="right">
+        <div class="footer-date top-date">................, ${dateText}</div>
         Hormat Saya<br>
         <b>Pemohon,</b>
         <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
         <b>${nama}</b><br>
         NIP. ${nip}
-        <div class="footer-date">Ujoh Bilang, ${dateText}</div>
       </td>
     </tr>
     <tr class="bottom">
@@ -443,12 +445,12 @@ li { margin-bottom:5px; }
         <div class="sig-line">(....................................................)</div>
       </td>
       <td class="right">
+        <div class="footer-date top-date">................, ${dateText}</div>
         Hormat Saya<br>
         <b>Pemohon,</b>
         <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
         <b>${nama}</b><br>
         NIP. ${nip}
-        <div class="footer-date">Ujoh Bilang, ${dateText}</div>
       </td>
     </tr>
   </table>
