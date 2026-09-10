@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS skbt_submissions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   nomor_pengajuan TEXT UNIQUE,
   nama_pemohon TEXT NOT NULL,
+  mode_pemohon TEXT DEFAULT 'OPD',
   nip TEXT,
   pangkat_golongan TEXT,
   jabatan TEXT,
