@@ -39,6 +39,7 @@ async function ensureSchema(env) {
 
     const submissionAdds = {
       pangkat_golongan: 'TEXT',
+      mode_pemohon: "TEXT DEFAULT 'OPD'",
       nomor_hp: 'TEXT',
       gmail: 'TEXT',
       keperluan: 'TEXT',
@@ -331,12 +332,12 @@ body { font-family: 'Times New Roman', Times, serif; color:#222; font-size:12pt;
 .letterhead td { vertical-align:middle; }
 .letterhead-logo { width:88px; text-align:left; padding:0 10px 0 0; }
 .letterhead-logo img { width:72px; height:82px; object-fit:contain; }
-.letterhead-title { text-align:center; color:#173f3b; padding-right:10px; }
-.letterhead-title .agency { font-size:12pt; font-weight:700; letter-spacing:.3px; margin-bottom:5px; }
+.letterhead-title { text-align:center; color:#000; padding-right:10px; }
+.letterhead-title .agency { font-size:12pt; font-weight:800; letter-spacing:.3px; margin-bottom:5px; }
 .letterhead-title .line1 { font-size:15pt; font-weight:800; letter-spacing:.2px; margin-bottom:2px; }
 .letterhead-title .line2 { font-size:13pt; font-weight:800; letter-spacing:.1px; margin-bottom:2px; }
 .letterhead-title .line3 { font-size:13pt; font-weight:800; letter-spacing:.15px; }
-.letterhead-rule { border-top:2px solid #173f3b; border-bottom:1px solid #c2a45a; height:4px; margin:0 0 18px; }
+.letterhead-rule { border-top:2px solid #000; border-bottom:1px solid #c2a45a; height:4px; margin:0 0 18px; }
 .meta { width:100%; border-collapse:collapse; margin-bottom:16px; }
 .meta td { padding:2px 0; vertical-align:top; color:#222; }
 .meta .label { width:85px; }
@@ -348,11 +349,13 @@ p { margin:0 0 12px; color:#222; text-align:justify; }
 ol { margin:6px 0 14px 23px; padding:0; color:#222; }
 li { margin-bottom:5px; }
 .signature { width:100%; border-collapse:separate; border-spacing:0; margin-top:30px; color:#222; table-layout:fixed; }
-.signature td { width:50%; vertical-align:top; text-align:center; padding:0 18px; border:0; height:190px; }
-.signature .left { padding-left:0; }
-.signature .right { padding-right:0; }
-.signature .left { text-align:left; }
-.sig-space { height:112px; line-height:16px; font-size:11pt; }
+.signature td { vertical-align:top; text-align:center; padding:0 18px; border:0; }
+.signature .left { padding-left:0; text-align:left; }
+.signature .right { padding-right:0; text-align:center; }
+.signature-uptd .top td { width:50%; height:205px; }
+.signature-uptd .bottom td { width:100%; height:175px; padding-top:12px; }
+.sig-space { height:120px; line-height:16px; font-size:11pt; }
+.signature-uptd .bottom .sig-space { height:95px; }
 .sig-line { margin-top:2px; }
 .footer-date { text-align:right; margin-top:12px; color:#222; }
 .small { font-size:9pt; color:#666; }
@@ -400,25 +403,56 @@ li { margin-bottom:5px; }
 
   <p>Demikian permohonan ini saya sampaikan, atas perhatian dan perkenan Bapak diucapkan terima kasih.</p>
 
-  <table class="signature">
-    <tr>
-      <td class="left">
-        <b>Mengetahui/Menyetujui :</b><br>
-        <b>Kepala Dinas/Badan</b><br>
-        (Pimpinan Pemohon)
-        <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
+  ${String(submission.mode_pemohon || 'OPD').toUpperCase() === 'UPTD' ? `
+  <table class="signature signature-uptd">
+    <tr class="top">
+      <td>
+        <b>Menyetujui :</b><br>
+        <b>Kepala Puskesmas/Rumah Sakit/Sekolah</b><br>
+        <i>(Pimpinan Pemohon)</i>
+        <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
         <div class="sig-line">(....................................................)</div>
       </td>
       <td class="right">
         Hormat Saya<br>
         <b>Pemohon,</b>
-        <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
+        <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
+        <b>${nama}</b><br>
+        NIP. ${nip}
+        <div class="footer-date">Ujoh Bilang, ${dateText}</div>
+      </td>
+    </tr>
+    <tr class="bottom">
+      <td colspan="2">
+        <b>Mengetahui :</b><br>
+        <b>Kepala Dinas/Badan</b><br>
+        <i>(Pimpinan Pemohon)</i>
+        <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
+        <div class="sig-line">(....................................................)</div>
+      </td>
+    </tr>
+  </table>
+  ` : `
+  <table class="signature">
+    <tr>
+      <td class="left">
+        <b>Mengetahui/Menyetujui :</b><br>
+        <b>Kepala Dinas/Badan</b><br>
+        <i>(Pimpinan Pemohon)</i>
+        <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
+        <div class="sig-line">(....................................................)</div>
+      </td>
+      <td class="right">
+        Hormat Saya<br>
+        <b>Pemohon,</b>
+        <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
         <b>${nama}</b><br>
         NIP. ${nip}
         <div class="footer-date">Ujoh Bilang, ${dateText}</div>
       </td>
     </tr>
   </table>
+  `}
   <div class="note">Dokumen ini dibuat otomatis dari Portal Pengajuan SKBT dan dapat diedit oleh pemohon melalui Google Docs.<br>${gmail ? `Akun edit: ${gmail}` : ''}</div>
 </body></html>`;
 }
@@ -504,7 +538,7 @@ export const onRequest = async ({ request, env }) => {
     switch (action) {
       case 'submitPengajuan': {
         const {
-          nama_pemohon, nip, pangkat_golongan, jabatan,
+          nama_pemohon, mode_pemohon, nip, pangkat_golongan, jabatan,
           unit_kerja, nomor_hp, gmail, keperluan,
         } = params;
 
@@ -515,10 +549,10 @@ export const onRequest = async ({ request, env }) => {
         const nomor = 'SKBT-' + Date.now().toString().slice(-8) + '-' + Math.floor(1000 + Math.random() * 9000);
         const insert = await env.DB.prepare(
           `INSERT INTO skbt_submissions
-          (nomor_pengajuan, nama_pemohon, nip, pangkat_golongan, jabatan, unit_kerja, nomor_hp, gmail, keperluan, status_verifikasi, current_level)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Draft', 1)`
+          (nomor_pengajuan, nama_pemohon, mode_pemohon, nip, pangkat_golongan, jabatan, unit_kerja, nomor_hp, gmail, keperluan, status_verifikasi, current_level)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Draft', 1)`
         ).bind(
-          nomor, nama_pemohon, nip || '', pangkat_golongan || '', jabatan || '',
+          nomor, nama_pemohon, ['UPTD','OPD'].includes(mode_pemohon) ? mode_pemohon : 'OPD', nip || '', pangkat_golongan || '', jabatan || '',
           unit_kerja, nomor_hp, gmail, keperluan || '',
         ).run();
 
