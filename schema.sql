@@ -1,21 +1,58 @@
--- Jalankan SEKALI pada D1 database lama yang sudah memiliki tabel SKBT.
--- Sesuaikan dengan keadaan database Anda bila ada kolom yang sudah pernah dibuat.
+-- ============================================================================
+-- SKBT DATABASE SCHEMA V2
+-- Jalankan migration_v2.sql pada database lama sebelum memakai versi ini.
+-- ============================================================================
 
-ALTER TABLE skbt_submissions ADD COLUMN pangkat_golongan TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN nomor_hp TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN gmail TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN keperluan TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN catatan_sekretaris TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN catatan_inspektur TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN gdrive_folder_id TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN gdocs_id TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN gdocs_url TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN gdocs_pdf_url TEXT;
-ALTER TABLE skbt_submissions ADD COLUMN gdocs_docx_url TEXT;
+CREATE TABLE IF NOT EXISTS skbt_submissions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nomor_pengajuan TEXT UNIQUE,
+  nama_pemohon TEXT NOT NULL,
+  nip TEXT,
+  pangkat_golongan TEXT,
+  jabatan TEXT,
+  unit_kerja TEXT,
+  nomor_hp TEXT,
+  gmail TEXT,
+  keperluan TEXT,
+  tanggal_pengajuan TEXT DEFAULT CURRENT_TIMESTAMP,
+  status_verifikasi TEXT DEFAULT 'Draft',
+  current_level INTEGER DEFAULT 1,
+  catatan_sekretaris TEXT,
+  catatan_inspektur TEXT,
+  gdrive_folder_id TEXT,
+  gdocs_id TEXT,
+  gdocs_url TEXT,
+  gdocs_pdf_url TEXT,
+  gdocs_docx_url TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
 
-ALTER TABLE skbt_documents ADD COLUMN r2_path TEXT;
-ALTER TABLE skbt_documents ADD COLUMN verification_status TEXT DEFAULT 'pending';
-ALTER TABLE skbt_documents ADD COLUMN verification_note TEXT DEFAULT '';
+CREATE TABLE IF NOT EXISTS skbt_documents (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  submission_id INTEGER NOT NULL,
+  dokumen_code TEXT NOT NULL,
+  nama_dokumen TEXT NOT NULL,
+  file_name TEXT,
+  file_url TEXT,
+  r2_path TEXT,
+  gdrive_id TEXT,
+  verification_status TEXT DEFAULT 'pending',
+  verification_note TEXT DEFAULT '',
+  uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(submission_id) REFERENCES skbt_submissions(id)
+);
 
--- Normalisasi status lama
-UPDATE skbt_submissions SET status_verifikasi = 'Menunggu Sekretaris Inspektorat', current_level = 1 WHERE status_verifikasi IN ('Menunggu Irban', 'Menunggu Verifikasi Irban');
+CREATE TABLE IF NOT EXISTS skbt_verification_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  submission_id INTEGER,
+  level_verifikasi INTEGER,
+  verifier_name TEXT,
+  status TEXT,
+  catatan TEXT,
+  verified_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(submission_id) REFERENCES skbt_submissions(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_skbt_documents_submission ON skbt_documents(submission_id);
+CREATE INDEX IF NOT EXISTS idx_skbt_documents_code ON skbt_documents(submission_id, dokumen_code);
+CREATE INDEX IF NOT EXISTS idx_skbt_submissions_status ON skbt_submissions(status_verifikasi);
