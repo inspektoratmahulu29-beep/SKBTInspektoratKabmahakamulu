@@ -319,17 +319,24 @@ function buildApplicationLetterHtml(submission) {
   const jabatan = escapeHtml(submission.jabatan || '________________________');
   const unit = escapeHtml(submission.unit_kerja || '________________________');
   const hp = escapeHtml(submission.nomor_hp || '________________________');
-  const nomor = escapeHtml(submission.nomor_pengajuan || '________________________');
+  const nomor = '';
   const gmail = escapeHtml(submission.gmail || '');
   const dateText = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'Asia/Makassar' });
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
-@page { size: A4; margin: 18mm 18mm 18mm 18mm; }
-body { font-family: Arial, Helvetica, sans-serif; color:#173f3b; font-size:11.5pt; line-height:1.42; margin:0; }
-.title-script { font-family:"Brush Script MT","Segoe Script",cursive; font-size:27pt; font-weight:700; text-align:center; margin:0; color:#174e49; }
-.title-main { text-align:center; font-size:18pt; font-weight:800; color:#174e49; margin:3px 0 10px; }
-.gold-line { width:155px; height:3px; background:#c2a45a; margin:0 auto 18px; }
+@page { size: A4; margin: 17mm 18mm 18mm 18mm; }
+body { font-family: 'Times New Roman', Times, serif; color:#222; font-size:12pt; line-height:1.42; margin:0; }
+.letterhead { width:100%; border-collapse:collapse; margin:0 0 5px; }
+.letterhead td { vertical-align:middle; }
+.letterhead-logo { width:88px; text-align:left; padding:0 10px 0 0; }
+.letterhead-logo img { width:72px; height:82px; object-fit:contain; }
+.letterhead-title { text-align:center; color:#173f3b; padding-right:10px; }
+.letterhead-title .agency { font-size:12pt; font-weight:700; letter-spacing:.3px; margin-bottom:5px; }
+.letterhead-title .line1 { font-size:15pt; font-weight:800; letter-spacing:.2px; margin-bottom:2px; }
+.letterhead-title .line2 { font-size:13pt; font-weight:800; letter-spacing:.1px; margin-bottom:2px; }
+.letterhead-title .line3 { font-size:13pt; font-weight:800; letter-spacing:.15px; }
+.letterhead-rule { border-top:2px solid #173f3b; border-bottom:1px solid #c2a45a; height:4px; margin:0 0 18px; }
 .meta { width:100%; border-collapse:collapse; margin-bottom:16px; }
 .meta td { padding:2px 0; vertical-align:top; color:#222; }
 .meta .label { width:85px; }
@@ -340,17 +347,28 @@ p { margin:0 0 12px; color:#222; text-align:justify; }
 .recipient { margin:4px 0 18px; color:#222; }
 ol { margin:6px 0 14px 23px; padding:0; color:#222; }
 li { margin-bottom:5px; }
-.signature { width:100%; border-collapse:collapse; margin-top:36px; color:#222; }
-.signature td { width:50%; vertical-align:top; text-align:center; padding:0 10px; }
+.signature { width:100%; border-collapse:separate; border-spacing:0; margin-top:30px; color:#222; table-layout:fixed; }
+.signature td { width:50%; vertical-align:top; text-align:center; padding:0 18px; border:0; height:190px; }
+.signature .left { padding-left:0; }
+.signature .right { padding-right:0; }
 .signature .left { text-align:left; }
-.sig-space { height:70px; }
-.footer-date { text-align:right; margin-top:26px; color:#222; }
+.sig-space { height:112px; line-height:16px; font-size:11pt; }
+.sig-line { margin-top:2px; }
+.footer-date { text-align:right; margin-top:12px; color:#222; }
 .small { font-size:9pt; color:#666; }
 .note { color:#174e49; font-size:9pt; margin-top:18px; }
 </style></head><body>
-  <div class="title-script">Surat Permohonan</div>
-  <div class="title-main">Penerbitan Surat Keterangan<br> Bebas Temuan</div>
-  <div class="gold-line"></div>
+  <table class="letterhead">
+    <tr>
+      <td class="letterhead-logo"><img src="https://skbtinspektoratkabmahakamulu.pages.dev/logo-mahakam.png" alt="Logo Mahakam Ulu"></td>
+      <td class="letterhead-title">
+        <div class="line1">SURAT PERMOHONAN</div>
+        <div class="line2">PENERBITAN SURAT KETERANGAN BEBAS TEMUAN (SKBT)</div>
+        <div class="line3">INSPEKTORAT DAERAH MAHAKAM ULU</div>
+      </td>
+    </tr>
+  </table>
+  <div class="letterhead-rule"></div>
 
   <table class="meta">
     <tr><td class="label">Nomor</td><td>: ${nomor}</td></tr>
@@ -384,12 +402,23 @@ li { margin-bottom:5px; }
 
   <table class="signature">
     <tr>
-      <td class="left"><b>Mengetahui/Menyetujui :</b><br><b>Kepala Dinas/Badan</b><br>(Pimpinan Pemohon)<div class="sig-space"></div>(....................................................)</td>
-      <td>Hormat Saya<br><b>Pemohon,</b><div class="sig-space"></div><b>${nama}</b><br>NIP. ${nip}</td>
+      <td class="left">
+        <b>Mengetahui/Menyetujui :</b><br>
+        <b>Kepala Dinas/Badan</b><br>
+        (Pimpinan Pemohon)
+        <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
+        <div class="sig-line">(....................................................)</div>
+      </td>
+      <td class="right">
+        Hormat Saya<br>
+        <b>Pemohon,</b>
+        <div class="sig-space">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>
+        <b>${nama}</b><br>
+        NIP. ${nip}
+        <div class="footer-date">Ujoh Bilang, ${dateText}</div>
+      </td>
     </tr>
   </table>
-
-  <div class="footer-date">Ujoh Bilang, ${dateText}</div>
   <div class="note">Dokumen ini dibuat otomatis dari Portal Pengajuan SKBT dan dapat diedit oleh pemohon melalui Google Docs.<br>${gmail ? `Akun edit: ${gmail}` : ''}</div>
 </body></html>`;
 }
